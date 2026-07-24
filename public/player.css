@@ -1,0 +1,373 @@
+/* ===== PLAYER (MOBILE) STYLES ===== */
+
+body {
+    background: #0f0f23;
+}
+
+/* Join Screen */
+.join-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 36px;
+    color: #fff;
+    margin-bottom: 30px;
+}
+.join-logo span {
+    background: linear-gradient(135deg, #E74C3C, #F39C12, #2ECC71, #3498DB);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.join-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 300px;
+}
+#room-code-input {
+    text-align: center;
+    font-size: 28px;
+    font-family: 'Fredoka One', cursive;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+/* Lobby */
+.waiting-box {
+    text-align: center;
+}
+.waiting-box h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: #2ECC71;
+    margin-bottom: 10px;
+}
+.waiting-text {
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+#lobby-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+.lobby-chip {
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: rgba(52,152,219,0.15);
+    border: 1px solid rgba(52,152,219,0.3);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Game Screen */
+#game-screen {
+    padding: 12px;
+    justify-content: flex-start;
+}
+#game-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.player-header .turn-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 14px;
+    color: #F39C12;
+}
+.player-header .my-turn-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: #27ae60;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.player-header .wait-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    font-size: 11px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.4);
+}
+
+/* UNO Player Hand */
+.hand-section {
+    width: 100%;
+}
+.hand-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 8px;
+}
+.hand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+    gap: 8px;
+}
+.hand-card {
+    aspect-ratio: 2/3;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+.hand-card::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotate(-20deg);
+    width: 60%; height: 80%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+}
+.hand-card span { position: relative; z-index: 1; }
+.hand-card.playable { border-color: rgba(255,255,255,0.6); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+.hand-card.playable:active { transform: scale(0.9); }
+.hand-card.not-playable { opacity: 0.4; }
+.hand-card.color-red { background: linear-gradient(145deg, #ff6b6b, #c0392b); }
+.hand-card.color-blue { background: linear-gradient(145deg, #74b9ff, #2980b9); }
+.hand-card.color-green { background: linear-gradient(145deg, #55efc4, #27ae60); }
+.hand-card.color-yellow { background: linear-gradient(145deg, #ffeaa7, #d4ac0d); color: #333; }
+.hand-card.color-wild { background: linear-gradient(145deg, #2c3e50, #1a1a2e); }
+
+.draw-btn {
+    width: 100%;
+    padding: 14px;
+    border: 2px dashed rgba(255,255,255,0.2);
+    border-radius: 12px;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.draw-btn:active { background: rgba(255,255,255,0.1); }
+
+/* Color Picker */
+.color-picker-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    backdrop-filter: blur(5px);
+}
+.color-picker-box {
+    text-align: center;
+}
+.color-picker-box h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.color-pick-btn {
+    width: 70px; height: 70px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.color-pick-btn:active { transform: scale(0.9); }
+
+/* Battleships Player */
+.bs-player-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    width: 100%;
+    max-width: 380px;
+}
+.bs-p-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: rgba(10,22,40,0.8);
+    border: 1px solid rgba(74,144,217,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.bs-p-cell:active { transform: scale(0.9); }
+.bs-p-cell.ship { background: rgba(74,144,217,0.4); border-color: #4a90d9; }
+.bs-p-cell.hit { background: #e74c3c; color: #fff; }
+.bs-p-cell.miss { background: rgba(90,108,125,0.3); color: rgba(255,255,255,0.4); }
+.bs-p-cell.preview { background: rgba(74,144,217,0.3); border-color: #4a90d9; }
+.bs-p-cell.preview-invalid { background: rgba(231,76,60,0.3); border-color: #e74c3c; }
+
+.ship-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 380px;
+}
+.ship-pick-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.ship-pick-item.selected { border-color: #4a90d9; background: rgba(74,144,217,0.1); }
+.ship-pick-item.placed { opacity: 0.35; pointer-events: none; }
+.ship-dots { display: flex; gap: 3px; }
+.ship-dot { width: 12px; height: 12px; background: #4a90d9; border-radius: 3px; }
+.ship-pick-name { font-size: 12px; font-weight: 700; }
+
+.bs-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Guess Who Player */
+.gw-player-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 380px;
+}
+.gw-p-char {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.gw-p-char.eliminated {
+    opacity: 0.25;
+    border-color: transparent;
+}
+.gw-p-char .face {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+.gw-p-char .name {
+    font-size: 9px;
+    font-weight: 700;
+}
+.gw-p-char .traits {
+    font-size: 8px;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    margin-top: 2px;
+}
+
+.gw-secret-bar {
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(243,156,18,0.1);
+    border: 1px solid rgba(243,156,18,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.gw-secret-bar .face {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.gw-actions {
+    display: flex;
+    gap: 10px;
+}
+.gw-guess-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 14px;
+    cursor: pointer;
+}
+.gw-end-turn-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #F39C12, #d68910);
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Winner */
+.player-winner {
+    text-align: center;
+    padding: 40px 20px;
+}
+.player-winner .icon { font-size: 60px; margin-bottom: 15px; }
+.player-winner h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+.player-winner p {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+}

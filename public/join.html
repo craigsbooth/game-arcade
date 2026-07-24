@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Arcade - Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="player.css">
+</head>
+<body>
+    <div id="app">
+        <div id="bg-effect"></div>
+
+        <!-- JOIN SCREEN -->
+        <div id="join-screen" class="screen active">
+            <h1 class="join-logo">GAME<span>ARCADE</span></h1>
+            <div class="join-form">
+                <div class="input-group">
+                    <label>Room Code</label>
+                    <input type="text" id="room-code-input" maxlength="4" placeholder="ABCD" autocapitalize="characters">
+                </div>
+                <div class="input-group">
+                    <label>Your Name</label>
+                    <input type="text" id="player-name-input" maxlength="12" placeholder="Enter name...">
+                </div>
+                <button id="join-btn" class="btn-primary">JOIN</button>
+                <p id="join-error" class="error-msg hidden"></p>
+            </div>
+        </div>
+
+        <!-- LOBBY WAITING -->
+        <div id="lobby-screen" class="screen">
+            <div class="waiting-box">
+                <h2>Joined!</h2>
+                <p class="waiting-text">Waiting for host to start...</p>
+                <div id="lobby-players"></div>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN (dynamic content) -->
+        <div id="game-screen" class="screen">
+            <div id="game-content"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="player.js"></script>
+</body>
+</html>
