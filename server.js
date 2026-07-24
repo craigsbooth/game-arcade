@@ -466,18 +466,19 @@ io.on('connection', (socket) => {
             code,
             game,
             phase: 'lobby',
-            players: [{ name: playerName || 'Player 1', socketId: socket.id, isHost: true }],
+            players: [],
             currentPlayer: 0,
-            settings: { maxPlayers: game === 'uno' ? 10 : 2 }
+            settings: { maxPlayers: game === 'uno' ? 10 : 2 },
+            hostSocketId: socket.id
         };
         rooms.set(code, room);
 
         socket.join(`display-${code}`);
         socket.join(code);
         socket.roomCode = code;
-        socket.playerIdx = 0;
+        socket.isHost = true;
 
-        socket.emit('roomCreated', { code, playerIdx: 0 });
+        socket.emit('roomCreated', { code });
         broadcastRoom(code);
     });
 
@@ -523,7 +524,7 @@ io.on('connection', (socket) => {
     socket.on('startGame', () => {
         const room = getRoom(socket.roomCode);
         if (!room) return;
-        if (socket.playerIdx !== 0) return; // only host can start
+        if (!socket.isHost) return; // only host display can start
 
         if (room.game === 'uno') {
             if (room.players.length < 2) return;
@@ -599,7 +600,8 @@ io.on('connection', (socket) => {
     // === RESTART ===
     socket.on('restart', () => {
         const room = getRoom(socket.roomCode);
-        if (!room || socket.playerIdx !== 0) return;
+        if (!room) return;
+        if (!socket.isHost) return;
         room.phase = 'lobby';
         broadcastRoom(room.code);
     });
