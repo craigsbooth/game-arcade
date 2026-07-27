@@ -314,9 +314,11 @@ class SnakeGame {
         // Particles
         for (let i = 0; i < this.particles.length; i++) {
             const p = this.particles[i];
-            ctx.fillStyle = `rgba(231, 76, 60, ${p.life})`;
+            const radius = Math.max(0, 3 * p.life);
+            if (radius <= 0) continue;
+            ctx.fillStyle = `rgba(231, 76, 60, ${Math.max(0, p.life)})`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3 * p.life, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
             ctx.fill();
         }
     }

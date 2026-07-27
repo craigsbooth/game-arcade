@@ -1,0 +1,7 @@
+[2026-07-27T09:51:50.904Z] [Snake] Snake tick error: Failed to execute 'arc' on 'CanvasRenderingContext2D': The radius provided (-9.57567e-16) is negative.
+  Stack: IndexSizeError: Failed to execute 'arc' on 'CanvasRenderingContext2D': The radius provided (-9.57567e-16) is negative.
+    at SnakeGame.draw (http://localhost:3000/games/snake/snake.js:319:17)
+    at SnakeGame.tick (http://localhost:3000/games/snake/snake.js:147:18)
+    at http://localhost:3000/games/snake/snake.js:96:50
+  UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36
+
