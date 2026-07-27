@@ -106,6 +106,9 @@ function renderDisplay() {
     if (state.game === 'uno') renderUno(content, turn);
     else if (state.game === 'battleships') renderBattleships(content, turn);
     else if (state.game === 'guesswho') renderGuessWho(content, turn);
+    else if (state.game === 'trivia') renderTrivia(content, turn);
+    else if (state.game === 'blackjack') renderBlackjack(content, turn);
+    else if (state.game === 'liarsdice') renderLiarsDice(content, turn);
 }
 
 // ===== UNO DISPLAY =====
@@ -215,6 +218,8 @@ function renderWinner(content, turn) {
     if (state.game === 'uno') winnerIdx = state.winner;
     else if (state.game === 'battleships') winnerIdx = state.winner;
     else if (state.game === 'guesswho') winnerIdx = state.winner;
+    else if (state.game === 'trivia') winnerIdx = state.winner;
+    else if (state.game === 'liarsdice') winnerIdx = state.ldWinner;
 
     const winnerName = winnerIdx !== null ? state.players[winnerIdx].name : 'Unknown';
 
@@ -224,6 +229,153 @@ function renderWinner(content, turn) {
             <h1>${winnerName} Wins!</h1>
             <p>${state.lastAction || 'Congratulations!'}</p>
             <button class="btn-primary" onclick="document.querySelector('.btn-primary').disabled=true; socket.emit('restart');">PLAY AGAIN</button>
+        </div>
+    `;
+}
+
+// ===== TRIVIA DISPLAY =====
+function renderTrivia(content, turn) {
+    const t = state;
+    if (t.phase === 'final' || t.phase === 'finished') {
+        renderWinner(content, turn);
+        return;
+    }
+
+    turn.textContent = `Question ${t.currentQuestion + 1} of ${t.totalQuestions}`;
+
+    if (t.phase === 'question') {
+        content.innerHTML = `
+            <div class="uno-display">
+                <div style="margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px">${t.category}</div>
+                <h2 style="font-family:'Fredoka One',cursive;font-size:26px;margin-bottom:24px;max-width:600px">${t.question}</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;margin:0 auto 20px;">
+                    ${t.answers.map((a, i) => `
+                        <div style="padding:14px 20px;border-radius:12px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.1);font-weight:700;font-size:15px;">
+                            <span style="color:rgba(255,255,255,0.4);margin-right:8px">${['A','B','C','D'][i]}</span>${a}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="uno-action">${t.answeredCount} of ${t.totalPlayers} answered</div>
+                <div class="uno-players" style="margin-top:16px">
+                    ${state.players.map((p, i) => `
+                        <div class="uno-player-card">
+                            <div class="name">${p.name}</div>
+                            <div class="cards">${t.scores[i]} <small>pts</small></div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    } else if (t.phase === 'results') {
+        content.innerHTML = `
+            <div class="uno-display">
+                <h2 style="font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:20px">${t.question}</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;margin:0 auto 20px;">
+                    ${t.answers.map((a, i) => `
+                        <div style="padding:14px 20px;border-radius:12px;font-weight:700;font-size:15px;border:2px solid ${i === t.correct ? '#2ecc71' : 'rgba(255,255,255,0.05)'};background:${i === t.correct ? 'rgba(46,204,113,0.15)' : 'rgba(255,255,255,0.03)'}">
+                            ${i === t.correct ? '✓ ' : ''}${a}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="uno-players" style="margin-top:16px">
+                    ${state.players.map((p, i) => `
+                        <div class="uno-player-card">
+                            <div class="name">${p.name}</div>
+                            <div class="cards">${t.scores[i]} <small>pts</small></div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn-primary" style="margin-top:20px" onclick="socket.emit('triviaNext')">Next Question →</button>
+            </div>
+        `;
+    }
+}
+
+// ===== BLACKJACK DISPLAY =====
+function renderBlackjack(content, turn) {
+    const bj = state;
+    if (bj.bjPhase === 'results') {
+        turn.textContent = 'Round Over';
+    } else {
+        turn.textContent = bj.bjPhase === 'playing' ? `${state.players[bj.bjCurrentPlayer].name}'s Turn` : 'Dealer playing...';
+    }
+
+    const dealerCards = (bj.dealer || []).map(c => c ? `<span style="margin:0 3px;padding:6px 10px;border-radius:6px;background:#fff;color:${c.suit === '♥' || c.suit === '♦' ? '#c0392b' : '#2c3e50'};font-weight:800;font-size:14px">${c.value}${c.suit}</span>` : `<span style="margin:0 3px;padding:6px 10px;border-radius:6px;background:#1a5276;color:#fff;font-size:14px">??</span>`).join('');
+
+    content.innerHTML = `
+        <div class="uno-display">
+            <div style="margin-bottom:24px">
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Dealer ${bj.dealerScore !== '?' ? `(${bj.dealerScore})` : ''}</div>
+                <div>${dealerCards}</div>
+            </div>
+            <div class="uno-players">
+                ${state.players.map((p, i) => {
+                    const ph = bj.playerHands[i];
+                    const cards = (ph.hand || []).map(c => `<span style="margin:0 2px;padding:4px 7px;border-radius:4px;background:#fff;color:${c.suit === '♥' || c.suit === '♦' ? '#c0392b' : '#2c3e50'};font-weight:700;font-size:12px">${c.value}${c.suit}</span>`).join('');
+                    let status = '';
+                    if (ph.busted) status = '💥 BUST';
+                    else if (ph.stood) status = '✋ STAND';
+                    else if (bj.bjPhase === 'results') {
+                        const r = bj.results[i];
+                        status = r.result === 'win' ? '🏆 WIN' : r.result === 'push' ? '🤝 PUSH' : '❌ LOSE';
+                    }
+                    return `
+                        <div class="uno-player-card${i === bj.bjCurrentPlayer && bj.bjPhase === 'playing' ? ' active' : ''}">
+                            <div class="name">${p.name}</div>
+                            <div style="margin:6px 0">${cards}</div>
+                            <div style="font-size:13px">${ph.score} ${status}</div>
+                            <div class="cards">${ph.chips} <small>chips</small></div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            ${bj.bjPhase === 'results' ? `<button class="btn-primary" style="margin-top:20px" onclick="socket.emit('bjNewRound')">Deal Again</button>` : ''}
+        </div>
+    `;
+}
+
+// ===== LIAR'S DICE DISPLAY =====
+function renderLiarsDice(content, turn) {
+    const ld = state;
+    if (ld.ldPhase === 'finished') {
+        renderWinner(content, turn);
+        return;
+    }
+
+    turn.textContent = ld.ldPhase === 'reveal' ? 'Challenge!' : `${state.players[state.currentPlayer].name}'s Turn`;
+
+    const bidText = ld.currentBid ? `Current bid: <strong>${ld.currentBid.quantity}× ${['⚀','⚁','⚂','⚃','⚄','⚅'][ld.currentBid.face-1]}</strong> by ${state.players[ld.currentBid.player].name}` : 'No bid yet';
+
+    let revealHTML = '';
+    if (ld.ldPhase === 'reveal' && ld.roundResults) {
+        const r = ld.roundResults;
+        revealHTML = `
+            <div style="padding:16px 24px;border-radius:12px;background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);margin-bottom:16px">
+                <div style="font-weight:800;margin-bottom:6px">${state.players[r.challenger].name} challenged!</div>
+                <div>Bid: ${r.bid.quantity}× ${'⚀⚁⚂⚃⚄⚅'[r.bid.face-1]} — Actual: ${r.actualCount}</div>
+                <div style="margin-top:6px;font-weight:800;color:#e74c3c">${state.players[r.loser].name} loses a die!</div>
+            </div>
+            <button class="btn-primary" onclick="socket.emit('ldNextRound')">Next Round</button>
+        `;
+    }
+
+    content.innerHTML = `
+        <div class="uno-display">
+            <div class="uno-action" style="margin-bottom:16px">${bidText}</div>
+            ${revealHTML}
+            <div class="uno-players">
+                ${state.players.map((p, i) => {
+                    const pd = ld.playerDice[i];
+                    const diceStr = pd.dice ? pd.dice.map(d => '⚀⚁⚂⚃⚄⚅'[d-1]).join(' ') : '🎲'.repeat(pd.diceCount);
+                    return `
+                        <div class="uno-player-card${i === state.currentPlayer && ld.ldPhase === 'bidding' ? ' active' : ''}${!pd.alive ? ' style="opacity:0.3"' : ''}">
+                            <div class="name">${p.name}</div>
+                            <div style="font-size:22px;margin:6px 0">${pd.alive ? diceStr : '☠️'}</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.4)">${pd.diceCount} dice</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
         </div>
     `;
 }

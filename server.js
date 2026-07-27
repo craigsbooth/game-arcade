@@ -69,6 +69,21 @@ function getDisplayState(room) {
         base.winner = room.guesswho.winner;
         base.lastAction = room.guesswho.lastAction;
         base.characters = room.guesswho.characters.map(c => ({ name: c.name, emoji: c.emoji, bg: c.bg }));
+    } else if (room.game === 'trivia' && room.trivia) {
+        Object.assign(base, getTriviaDisplayState(room));
+    } else if (room.game === 'blackjack' && room.blackjack) {
+        base.dealer = room.blackjack.phase === 'playing' ? [room.blackjack.dealer[0], null] : room.blackjack.dealer;
+        base.dealerScore = room.blackjack.phase === 'playing' ? '?' : cardScore(room.blackjack.dealer);
+        base.bjPhase = room.blackjack.phase;
+        base.bjCurrentPlayer = room.blackjack.currentPlayer;
+        base.playerHands = room.players.map(p => ({ hand: p.bjHand, score: cardScore(p.bjHand || []), busted: p.bjBusted, stood: p.bjStood, chips: p.bjChips }));
+        base.results = room.blackjack.results;
+    } else if (room.game === 'liarsdice' && room.liarsdice) {
+        base.ldPhase = room.liarsdice.phase;
+        base.currentBid = room.liarsdice.currentBid;
+        base.playerDice = room.players.map(p => ({ alive: p.ldAlive, diceCount: p.ldDiceCount, dice: room.liarsdice.phase === 'reveal' || room.liarsdice.phase === 'finished' ? p.ldDice : null }));
+        base.roundResults = room.liarsdice.roundResults;
+        base.ldWinner = room.liarsdice.winner;
     }
 
     return base;
@@ -108,6 +123,30 @@ function getPlayerState(room, playerIdx) {
         base.eliminated = room.players[playerIdx].eliminated || [];
         base.characters = room.guesswho.characters;
         base.winner = room.guesswho.winner;
+    } else if (room.game === 'trivia' && room.trivia) {
+        Object.assign(base, getTriviaPlayerState(room, playerIdx));
+    } else if (room.game === 'blackjack' && room.blackjack) {
+        base.myHand = room.players[playerIdx].bjHand;
+        base.myScore = cardScore(room.players[playerIdx].bjHand || []);
+        base.myChips = room.players[playerIdx].bjChips;
+        base.myBusted = room.players[playerIdx].bjBusted;
+        base.myStood = room.players[playerIdx].bjStood;
+        base.bjPhase = room.blackjack.phase;
+        base.bjCurrentPlayer = room.blackjack.currentPlayer;
+        base.isMyBjTurn = room.blackjack.currentPlayer === playerIdx;
+        base.dealer = room.blackjack.phase === 'playing' ? [room.blackjack.dealer[0], null] : room.blackjack.dealer;
+        base.dealerScore = room.blackjack.phase === 'playing' ? '?' : cardScore(room.blackjack.dealer);
+        base.results = room.blackjack.results;
+    } else if (room.game === 'liarsdice' && room.liarsdice) {
+        base.myDice = room.players[playerIdx].ldDice;
+        base.myAlive = room.players[playerIdx].ldAlive;
+        base.myDiceCount = room.players[playerIdx].ldDiceCount;
+        base.ldPhase = room.liarsdice.phase;
+        base.currentBid = room.liarsdice.currentBid;
+        base.isMyLdTurn = room.currentPlayer === playerIdx;
+        base.playerDice = room.players.map(p => ({ alive: p.ldAlive, diceCount: p.ldDiceCount }));
+        base.roundResults = room.liarsdice.roundResults;
+        base.ldWinner = room.liarsdice.winner;
     }
 
     return base;
@@ -454,6 +493,380 @@ function gwEndTurn(room, playerIdx) {
     return true;
 }
 
+// ===== TRIVIA LOGIC =====
+const TRIVIA_QUESTIONS = [
+    { q: "What planet is known as the Red Planet?", answers: ["Mars", "Venus", "Jupiter", "Saturn"], correct: 0, category: "Science" },
+    { q: "Who painted the Mona Lisa?", answers: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"], correct: 1, category: "Art" },
+    { q: "What is the capital of Japan?", answers: ["Seoul", "Beijing", "Tokyo", "Bangkok"], correct: 2, category: "Geography" },
+    { q: "Which element has the chemical symbol 'O'?", answers: ["Gold", "Oxygen", "Osmium", "Oganesson"], correct: 1, category: "Science" },
+    { q: "In what year did the Titanic sink?", answers: ["1905", "1912", "1918", "1923"], correct: 1, category: "History" },
+    { q: "What is the largest ocean on Earth?", answers: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3, category: "Geography" },
+    { q: "Who wrote 'Romeo and Juliet'?", answers: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], correct: 1, category: "Literature" },
+    { q: "What is the speed of light approximately?", answers: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "1,000,000 km/s"], correct: 0, category: "Science" },
+    { q: "Which country hosted the 2016 Olympics?", answers: ["China", "UK", "Brazil", "Russia"], correct: 2, category: "Sports" },
+    { q: "What is the smallest prime number?", answers: ["0", "1", "2", "3"], correct: 2, category: "Math" },
+    { q: "Which band sang 'Bohemian Rhapsody'?", answers: ["The Beatles", "Queen", "Led Zeppelin", "Pink Floyd"], correct: 1, category: "Music" },
+    { q: "What is the hardest natural substance?", answers: ["Gold", "Iron", "Diamond", "Platinum"], correct: 2, category: "Science" },
+    { q: "Who was the first person to walk on the Moon?", answers: ["Buzz Aldrin", "Neil Armstrong", "Yuri Gagarin", "John Glenn"], correct: 1, category: "History" },
+    { q: "What language has the most native speakers?", answers: ["English", "Spanish", "Hindi", "Mandarin Chinese"], correct: 3, category: "Language" },
+    { q: "Which planet has the most moons?", answers: ["Jupiter", "Saturn", "Uranus", "Neptune"], correct: 1, category: "Science" },
+    { q: "What year was the iPhone first released?", answers: ["2005", "2006", "2007", "2008"], correct: 2, category: "Technology" },
+    { q: "Who directed Jurassic Park?", answers: ["James Cameron", "Steven Spielberg", "George Lucas", "Ridley Scott"], correct: 1, category: "Film" },
+    { q: "What is the largest continent by area?", answers: ["Africa", "North America", "Europe", "Asia"], correct: 3, category: "Geography" },
+    { q: "How many bones are in the adult human body?", answers: ["186", "206", "226", "246"], correct: 1, category: "Science" },
+    { q: "Which country invented pizza?", answers: ["France", "Greece", "Italy", "Spain"], correct: 2, category: "Food" },
+    { q: "What is the chemical formula for water?", answers: ["CO2", "H2O", "NaCl", "O2"], correct: 1, category: "Science" },
+    { q: "Who painted 'Starry Night'?", answers: ["Monet", "Picasso", "Van Gogh", "Rembrandt"], correct: 2, category: "Art" },
+    { q: "What is the longest river in the world?", answers: ["Amazon", "Nile", "Mississippi", "Yangtze"], correct: 1, category: "Geography" },
+    { q: "In which year did World War II end?", answers: ["1943", "1944", "1945", "1946"], correct: 2, category: "History" },
+    { q: "What does 'HTTP' stand for?", answers: ["HyperText Transfer Protocol", "High Tech Transfer Protocol", "HyperText Transmission Program", "Home Tool Transfer Protocol"], correct: 0, category: "Technology" }
+];
+
+function startTriviaGame(room) {
+    const questions = shuffle([...TRIVIA_QUESTIONS]).slice(0, 10);
+    room.trivia = {
+        questions,
+        currentQuestion: 0,
+        scores: room.players.map(() => 0),
+        answers: room.players.map(() => null),
+        phase: 'question', // question, results, final
+        timer: null,
+        winner: null
+    };
+    room.phase = 'playing';
+}
+
+function triviaAnswer(room, playerIdx, answerIdx) {
+    if (room.trivia.phase !== 'question') return false;
+    if (room.trivia.answers[playerIdx] !== null) return false;
+    room.trivia.answers[playerIdx] = answerIdx;
+
+    // Check if all answered
+    const allAnswered = room.trivia.answers.every(a => a !== null);
+    if (allAnswered) {
+        triviaShowResults(room);
+    }
+    return true;
+}
+
+function triviaShowResults(room) {
+    room.trivia.phase = 'results';
+    const q = room.trivia.questions[room.trivia.currentQuestion];
+    room.trivia.answers.forEach((ans, i) => {
+        if (ans === q.correct) {
+            room.trivia.scores[i] += 100;
+        }
+    });
+}
+
+function triviaNextQuestion(room) {
+    room.trivia.currentQuestion++;
+    if (room.trivia.currentQuestion >= room.trivia.questions.length) {
+        // Game over
+        room.trivia.phase = 'final';
+        room.phase = 'finished';
+        const maxScore = Math.max(...room.trivia.scores);
+        room.trivia.winner = room.trivia.scores.indexOf(maxScore);
+    } else {
+        room.trivia.phase = 'question';
+        room.trivia.answers = room.players.map(() => null);
+    }
+}
+
+function getTriviaDisplayState(room) {
+    const t = room.trivia;
+    const base = {
+        currentQuestion: t.currentQuestion,
+        totalQuestions: t.questions.length,
+        scores: t.scores,
+        phase: t.phase,
+        winner: t.winner,
+        answeredCount: t.answers.filter(a => a !== null).length,
+        totalPlayers: room.players.length
+    };
+    if (t.phase === 'question') {
+        const q = t.questions[t.currentQuestion];
+        base.question = q.q;
+        base.category = q.category;
+        base.answers = q.answers;
+    }
+    if (t.phase === 'results' || t.phase === 'final') {
+        const q = t.questions[t.currentQuestion < t.questions.length ? t.currentQuestion : t.currentQuestion - 1];
+        base.question = q.q;
+        base.answers = q.answers;
+        base.correct = q.correct;
+        base.playerAnswers = t.answers;
+    }
+    return base;
+}
+
+function getTriviaPlayerState(room, playerIdx) {
+    const t = room.trivia;
+    const base = {
+        currentQuestion: t.currentQuestion,
+        totalQuestions: t.questions.length,
+        myScore: t.scores[playerIdx],
+        phase: t.phase,
+        myAnswer: t.answers[playerIdx],
+        winner: t.winner
+    };
+    if (t.phase === 'question') {
+        const q = t.questions[t.currentQuestion];
+        base.question = q.q;
+        base.category = q.category;
+        base.answers = q.answers;
+    }
+    if (t.phase === 'results') {
+        const q = t.questions[t.currentQuestion];
+        base.correct = q.correct;
+    }
+    return base;
+}
+
+// ===== BLACKJACK LOGIC =====
+function createBlackjackDeck() {
+    const suits = ['♠','♥','♦','♣'];
+    const values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    const deck = [];
+    for (let d = 0; d < 6; d++) { // 6-deck shoe
+        suits.forEach(s => values.forEach(v => deck.push({ suit: s, value: v })));
+    }
+    return shuffle(deck);
+}
+
+function cardScore(hand) {
+    let total = 0;
+    let aces = 0;
+    hand.forEach(c => {
+        if (c.value === 'A') { aces++; total += 11; }
+        else if (['J','Q','K'].includes(c.value)) { total += 10; }
+        else { total += parseInt(c.value); }
+    });
+    while (total > 21 && aces > 0) { total -= 10; aces--; }
+    return total;
+}
+
+function startBlackjackGame(room) {
+    room.blackjack = {
+        deck: createBlackjackDeck(),
+        dealer: [],
+        phase: 'betting', // betting, playing, dealer, results
+        currentPlayer: 0,
+        results: null
+    };
+    room.players.forEach(p => {
+        p.bjHand = [];
+        p.bjBet = 100;
+        p.bjChips = p.bjChips || 1000;
+        p.bjStood = false;
+        p.bjBusted = false;
+    });
+    room.phase = 'playing';
+    // Deal
+    bjDeal(room);
+}
+
+function bjDeal(room) {
+    const bj = room.blackjack;
+    // Deal 2 cards to each player and dealer
+    room.players.forEach(p => {
+        p.bjHand = [bj.deck.pop(), bj.deck.pop()];
+        p.bjStood = false;
+        p.bjBusted = false;
+    });
+    bj.dealer = [bj.deck.pop(), bj.deck.pop()];
+    bj.phase = 'playing';
+    bj.currentPlayer = 0;
+}
+
+function bjHit(room, playerIdx) {
+    if (room.blackjack.phase !== 'playing') return false;
+    if (room.blackjack.currentPlayer !== playerIdx) return false;
+    const p = room.players[playerIdx];
+    if (p.bjStood || p.bjBusted) return false;
+
+    p.bjHand.push(room.blackjack.deck.pop());
+    if (cardScore(p.bjHand) > 21) {
+        p.bjBusted = true;
+        bjAdvancePlayer(room);
+    }
+    return true;
+}
+
+function bjStand(room, playerIdx) {
+    if (room.blackjack.phase !== 'playing') return false;
+    if (room.blackjack.currentPlayer !== playerIdx) return false;
+    room.players[playerIdx].bjStood = true;
+    bjAdvancePlayer(room);
+    return true;
+}
+
+function bjAdvancePlayer(room) {
+    const bj = room.blackjack;
+    bj.currentPlayer++;
+    if (bj.currentPlayer >= room.players.length) {
+        // Dealer's turn
+        bjDealerPlay(room);
+    }
+}
+
+function bjDealerPlay(room) {
+    const bj = room.blackjack;
+    bj.phase = 'dealer';
+    // Dealer hits until 17
+    while (cardScore(bj.dealer) < 17) {
+        bj.dealer.push(bj.deck.pop());
+    }
+    bjResolve(room);
+}
+
+function bjResolve(room) {
+    const bj = room.blackjack;
+    bj.phase = 'results';
+    room.phase = 'finished';
+    const dealerScore = cardScore(bj.dealer);
+    const dealerBust = dealerScore > 21;
+
+    bj.results = room.players.map((p, i) => {
+        const pScore = cardScore(p.bjHand);
+        if (p.bjBusted) return { result: 'bust', delta: -p.bjBet };
+        if (dealerBust) return { result: 'win', delta: p.bjBet };
+        if (pScore > dealerScore) return { result: 'win', delta: p.bjBet };
+        if (pScore === dealerScore) return { result: 'push', delta: 0 };
+        return { result: 'lose', delta: -p.bjBet };
+    });
+
+    // Apply chips
+    bj.results.forEach((r, i) => {
+        room.players[i].bjChips += r.delta;
+    });
+}
+
+// ===== LIAR'S DICE LOGIC =====
+function startLiarsDice(room) {
+    room.liarsdice = {
+        dicePerPlayer: 5,
+        currentBid: null, // { quantity, face }
+        phase: 'rolling', // rolling, bidding, reveal, finished
+        roundResults: null,
+        winner: null
+    };
+    room.players.forEach(p => {
+        p.ldDice = [];
+        p.ldAlive = true;
+        p.ldDiceCount = 5;
+    });
+    room.currentPlayer = 0;
+    room.phase = 'playing';
+    ldRoll(room);
+}
+
+function ldRoll(room) {
+    room.players.forEach(p => {
+        if (!p.ldAlive) return;
+        p.ldDice = [];
+        for (let i = 0; i < p.ldDiceCount; i++) {
+            p.ldDice.push(Math.floor(Math.random() * 6) + 1);
+        }
+    });
+    room.liarsdice.currentBid = null;
+    room.liarsdice.phase = 'bidding';
+}
+
+function ldBid(room, playerIdx, quantity, face) {
+    if (room.liarsdice.phase !== 'bidding') return false;
+    if (room.currentPlayer !== playerIdx) return false;
+    if (face < 1 || face > 6) return false;
+    if (quantity < 1) return false;
+
+    const prev = room.liarsdice.currentBid;
+    if (prev) {
+        // Must be higher: more quantity, or same quantity but higher face
+        if (quantity < prev.quantity) return false;
+        if (quantity === prev.quantity && face <= prev.face) return false;
+    }
+
+    room.liarsdice.currentBid = { quantity, face, player: playerIdx };
+    ldNextPlayer(room);
+    return true;
+}
+
+function ldChallenge(room, playerIdx) {
+    if (room.liarsdice.phase !== 'bidding') return false;
+    if (room.currentPlayer !== playerIdx) return false;
+    if (!room.liarsdice.currentBid) return false;
+
+    const bid = room.liarsdice.currentBid;
+
+    // Count all dice with that face (1s are wild unless bidding 1s)
+    let count = 0;
+    room.players.forEach(p => {
+        if (!p.ldAlive) return;
+        p.ldDice.forEach(d => {
+            if (d === bid.face) count++;
+            else if (d === 1 && bid.face !== 1) count++; // 1s are wild
+        });
+    });
+
+    const bidderIdx = bid.player;
+    room.liarsdice.phase = 'reveal';
+
+    if (count >= bid.quantity) {
+        // Bid was correct, challenger loses a die
+        room.players[playerIdx].ldDiceCount--;
+        room.liarsdice.roundResults = {
+            challenger: playerIdx,
+            bidder: bidderIdx,
+            bid,
+            actualCount: count,
+            loser: playerIdx
+        };
+    } else {
+        // Bid was wrong, bidder loses a die
+        room.players[bidderIdx].ldDiceCount--;
+        room.liarsdice.roundResults = {
+            challenger: playerIdx,
+            bidder: bidderIdx,
+            bid,
+            actualCount: count,
+            loser: bidderIdx
+        };
+    }
+
+    // Check elimination
+    room.players.forEach(p => {
+        if (p.ldDiceCount <= 0) p.ldAlive = false;
+    });
+
+    // Check winner
+    const alive = room.players.filter(p => p.ldAlive);
+    if (alive.length === 1) {
+        room.liarsdice.winner = room.players.indexOf(alive[0]);
+        room.liarsdice.phase = 'finished';
+        room.phase = 'finished';
+    }
+
+    return true;
+}
+
+function ldNextRound(room) {
+    if (room.liarsdice.phase === 'finished') return;
+    // Loser starts next round
+    const loserIdx = room.liarsdice.roundResults.loser;
+    room.currentPlayer = loserIdx;
+    // If loser is eliminated, go next
+    while (!room.players[room.currentPlayer].ldAlive) {
+        room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
+    }
+    ldRoll(room);
+}
+
+function ldNextPlayer(room) {
+    do {
+        room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
+    } while (!room.players[room.currentPlayer].ldAlive);
+}
+
 // ===== SOCKET.IO =====
 io.on('connection', (socket) => {
 
@@ -468,7 +881,7 @@ io.on('connection', (socket) => {
             phase: 'lobby',
             players: [],
             currentPlayer: 0,
-            settings: { maxPlayers: game === 'uno' ? 10 : 2 },
+            settings: { maxPlayers: (game === 'uno' || game === 'trivia') ? 10 : (game === 'liarsdice' || game === 'blackjack') ? 6 : 2 },
             hostSocketId: socket.id
         };
         rooms.set(code, room);
@@ -535,6 +948,15 @@ io.on('connection', (socket) => {
         } else if (room.game === 'guesswho') {
             if (room.players.length !== 2) return;
             startGuessWhoGame(room);
+        } else if (room.game === 'trivia') {
+            if (room.players.length < 2) return;
+            startTriviaGame(room);
+        } else if (room.game === 'blackjack') {
+            if (room.players.length < 2) return;
+            startBlackjackGame(room);
+        } else if (room.game === 'liarsdice') {
+            if (room.players.length < 2) return;
+            startLiarsDice(room);
         }
         broadcastRoom(room.code);
     });
@@ -595,6 +1017,74 @@ io.on('connection', (socket) => {
         if (gwEndTurn(room, socket.playerIdx)) {
             broadcastRoom(room.code);
         }
+    });
+
+    // === TRIVIA ACTIONS ===
+    socket.on('triviaAnswer', ({ answerIdx }) => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'trivia' || room.phase !== 'playing') return;
+        if (triviaAnswer(room, socket.playerIdx, answerIdx)) {
+            broadcastRoom(room.code);
+        }
+    });
+
+    socket.on('triviaNext', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'trivia') return;
+        if (!socket.isHost) return;
+        triviaNextQuestion(room);
+        broadcastRoom(room.code);
+    });
+
+    // === BLACKJACK ACTIONS ===
+    socket.on('bjHit', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'blackjack' || room.blackjack.phase !== 'playing') return;
+        if (bjHit(room, socket.playerIdx)) {
+            broadcastRoom(room.code);
+        }
+    });
+
+    socket.on('bjStand', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'blackjack' || room.blackjack.phase !== 'playing') return;
+        if (bjStand(room, socket.playerIdx)) {
+            broadcastRoom(room.code);
+        }
+    });
+
+    socket.on('bjNewRound', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'blackjack') return;
+        if (!socket.isHost) return;
+        bjDeal(room);
+        room.phase = 'playing';
+        broadcastRoom(room.code);
+    });
+
+    // === LIAR'S DICE ACTIONS ===
+    socket.on('ldBid', ({ quantity, face }) => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'liarsdice') return;
+        if (ldBid(room, socket.playerIdx, quantity, face)) {
+            broadcastRoom(room.code);
+        }
+    });
+
+    socket.on('ldChallenge', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'liarsdice') return;
+        if (ldChallenge(room, socket.playerIdx)) {
+            broadcastRoom(room.code);
+        }
+    });
+
+    socket.on('ldNextRound', () => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'liarsdice') return;
+        if (!socket.isHost) return;
+        ldNextRound(room);
+        broadcastRoom(room.code);
     });
 
     // === RESTART ===

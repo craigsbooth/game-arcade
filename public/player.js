@@ -95,6 +95,9 @@ function renderGame() {
     if (state.game === 'uno') renderUnoPlayer(content);
     else if (state.game === 'battleships') renderBsPlayer(content);
     else if (state.game === 'guesswho') renderGwPlayer(content);
+    else if (state.game === 'trivia') renderTriviaPlayer(content);
+    else if (state.game === 'blackjack') renderBjPlayer(content);
+    else if (state.game === 'liarsdice') renderLdPlayer(content);
 }
 
 // ===== UNO PLAYER =====
@@ -416,6 +419,8 @@ function renderWinner(content) {
     if (state.game === 'uno') winnerIdx = state.winner;
     else if (state.game === 'battleships') winnerIdx = state.winner;
     else if (state.game === 'guesswho') winnerIdx = state.winner;
+    else if (state.game === 'trivia') winnerIdx = state.winner;
+    else if (state.game === 'liarsdice') winnerIdx = state.ldWinner;
 
     const isWinner = winnerIdx === state.playerIdx;
     content.innerHTML = `
@@ -425,4 +430,166 @@ function renderWinner(content) {
             <p>${isWinner ? 'Congratulations!' : 'Better luck next time!'}</p>
         </div>
     `;
+}
+
+
+// ===== TRIVIA PLAYER =====
+function renderTriviaPlayer(content) {
+    const t = state;
+
+    if (t.phase === 'final' || t.phase === 'finished') {
+        renderWinner(content);
+        return;
+    }
+
+    if (t.phase === 'question') {
+        const answered = t.myAnswer !== null;
+        content.innerHTML = `
+            <div class="player-header">
+                <span class="turn-text">Q${t.currentQuestion + 1}/${t.totalQuestions}</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.5)">${t.myScore} pts</span>
+            </div>
+            <div style="padding:12px;text-align:center">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">${t.category}</div>
+                <h3 style="font-size:17px;font-weight:800;margin-bottom:16px;line-height:1.4">${t.question}</h3>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    ${t.answers.map((a, i) => `
+                        <button class="draw-btn" style="text-align:left;padding:14px 16px;opacity:${answered ? (t.myAnswer === i ? 1 : 0.4) : 1};border-color:${answered && t.myAnswer === i ? '#3498db' : 'rgba(255,255,255,0.2)'}" 
+                            ${answered ? 'disabled' : `onclick="socket.emit('triviaAnswer',{answerIdx:${i}})"`}>
+                            <strong style="margin-right:8px">${['A','B','C','D'][i]}</strong>${a}
+                        </button>
+                    `).join('')}
+                </div>
+                ${answered ? '<p style="margin-top:12px;color:rgba(255,255,255,0.4);font-size:13px">Waiting for others...</p>' : ''}
+            </div>
+        `;
+    } else if (t.phase === 'results') {
+        const correct = t.myAnswer === t.correct;
+        content.innerHTML = `
+            <div class="player-header">
+                <span class="turn-text">${correct ? '✓ Correct!' : '✗ Wrong'}</span>
+                <span style="font-size:13px;color:${correct ? '#2ecc71' : '#e74c3c'}">${correct ? '+100' : '+0'}</span>
+            </div>
+            <div style="text-align:center;padding:20px">
+                <div style="font-size:48px;margin-bottom:12px">${correct ? '🎉' : '😢'}</div>
+                <p style="color:rgba(255,255,255,0.5);font-size:14px">Score: ${t.myScore} pts</p>
+                <p style="color:rgba(255,255,255,0.3);font-size:12px;margin-top:10px">Waiting for host...</p>
+            </div>
+        `;
+    }
+}
+
+// ===== BLACKJACK PLAYER =====
+function renderBjPlayer(content) {
+    const bj = state;
+
+    if (bj.bjPhase === 'results') {
+        const r = bj.results[state.playerIdx];
+        const icon = r.result === 'win' ? '🏆' : r.result === 'push' ? '🤝' : '💥';
+        content.innerHTML = `
+            <div class="player-winner">
+                <div class="icon">${icon}</div>
+                <h2>${r.result.toUpperCase()}</h2>
+                <p>${r.delta >= 0 ? '+' : ''}${r.delta} chips (${bj.myChips} total)</p>
+            </div>
+        `;
+        return;
+    }
+
+    const myCards = (bj.myHand || []).map(c => `<span style="display:inline-block;margin:3px;padding:8px 12px;border-radius:8px;background:#fff;color:${c.suit === '♥' || c.suit === '♦' ? '#c0392b' : '#2c3e50'};font-weight:800;font-size:16px">${c.value}${c.suit}</span>`).join('');
+    const isMyTurn = bj.isMyBjTurn && !bj.myBusted && !bj.myStood;
+
+    content.innerHTML = `
+        <div class="player-header">
+            <span class="turn-text">${isMyTurn ? 'Your Turn' : state.players[bj.bjCurrentPlayer]?.name + "'s turn"}</span>
+            ${isMyTurn ? '<span class="my-turn-badge">HIT or STAND</span>' : '<span class="wait-badge">WAITING</span>'}
+        </div>
+        <div style="text-align:center;padding:16px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px">Your Hand (${bj.myScore})</div>
+            <div style="margin-bottom:16px">${myCards}</div>
+            ${bj.myBusted ? '<div style="color:#e74c3c;font-weight:800;font-size:18px">BUST! 💥</div>' : ''}
+            ${bj.myStood ? '<div style="color:rgba(255,255,255,0.5);font-weight:700">Standing on ${bj.myScore}</div>' : ''}
+            ${isMyTurn ? `
+                <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+                    <button class="gw-guess-btn" onclick="socket.emit('bjHit')">HIT</button>
+                    <button class="gw-end-turn-btn" onclick="socket.emit('bjStand')">STAND</button>
+                </div>
+            ` : ''}
+            <div style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.4)">Chips: ${bj.myChips}</div>
+        </div>
+    `;
+}
+
+// ===== LIAR'S DICE PLAYER =====
+function renderLdPlayer(content) {
+    const ld = state;
+
+    if (ld.ldPhase === 'finished') {
+        renderWinner(content);
+        return;
+    }
+
+    const myDice = (ld.myDice || []).map(d => `<span style="font-size:32px;margin:0 4px">${'⚀⚁⚂⚃⚄⚅'[d-1]}</span>`).join('');
+    const bidText = ld.currentBid ? `${ld.currentBid.quantity}× ${'⚀⚁⚂⚃⚄⚅'[ld.currentBid.face-1]}` : 'None';
+    const isMyTurn = ld.isMyLdTurn && ld.ldPhase === 'bidding';
+
+    if (ld.ldPhase === 'reveal') {
+        const r = ld.roundResults;
+        content.innerHTML = `
+            <div class="player-header">
+                <span class="turn-text">Challenge!</span>
+            </div>
+            <div style="text-align:center;padding:20px">
+                <p style="font-weight:800;font-size:16px;margin-bottom:8px">${state.players[r.challenger].name} challenged ${state.players[r.bidder].name}</p>
+                <p>Bid: ${r.bid.quantity}× ${'⚀⚁⚂⚃⚄⚅'[r.bid.face-1]} — Actual: ${r.actualCount}</p>
+                <p style="color:#e74c3c;font-weight:800;margin-top:8px">${state.players[r.loser].name} loses a die!</p>
+                <p style="color:rgba(255,255,255,0.3);font-size:12px;margin-top:16px">Waiting for host...</p>
+            </div>
+        `;
+        return;
+    }
+
+    content.innerHTML = `
+        <div class="player-header">
+            <span class="turn-text">${isMyTurn ? 'Your Turn' : 'Waiting...'}</span>
+            ${isMyTurn ? '<span class="my-turn-badge">BID or CHALLENGE</span>' : '<span class="wait-badge">' + state.players[state.currentPlayer].name + '</span>'}
+        </div>
+        <div style="text-align:center;padding:12px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px">Your Dice</div>
+            <div style="margin-bottom:16px">${myDice}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px">Current bid: <strong>${bidText}</strong></div>
+            ${isMyTurn ? `
+                <div id="ld-bid-form" style="margin-bottom:12px">
+                    <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:12px">
+                        <label style="font-size:12px;font-weight:700">Qty:</label>
+                        <input type="number" id="ld-qty" min="1" max="30" value="${ld.currentBid ? ld.currentBid.quantity : 1}" style="width:50px;padding:8px;border-radius:8px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:16px;text-align:center">
+                        <label style="font-size:12px;font-weight:700">Face:</label>
+                        <div style="display:flex;gap:4px" id="ld-face-btns">
+                            ${[1,2,3,4,5,6].map(f => `<button class="ctrl-btn" style="width:36px;height:36px;font-size:18px;border-radius:8px" data-face="${f}">${'⚀⚁⚂⚃⚄⚅'[f-1]}</button>`).join('')}
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:center">
+                        <button class="gw-end-turn-btn" id="ld-bid-btn">Place Bid</button>
+                        ${ld.currentBid ? `<button class="gw-guess-btn" onclick="socket.emit('ldChallenge')">🚨 Challenge!</button>` : ''}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    if (isMyTurn) {
+        let selectedFace = ld.currentBid ? ld.currentBid.face : 1;
+        document.querySelectorAll('#ld-face-btns .ctrl-btn').forEach(btn => {
+            btn.style.borderColor = parseInt(btn.dataset.face) === selectedFace ? '#F39C12' : 'rgba(255,255,255,0.2)';
+            btn.addEventListener('click', () => {
+                selectedFace = parseInt(btn.dataset.face);
+                document.querySelectorAll('#ld-face-btns .ctrl-btn').forEach(b => b.style.borderColor = 'rgba(255,255,255,0.2)');
+                btn.style.borderColor = '#F39C12';
+            });
+        });
+        document.getElementById('ld-bid-btn').addEventListener('click', () => {
+            const qty = parseInt(document.getElementById('ld-qty').value);
+            socket.emit('ldBid', { quantity: qty, face: selectedFace });
+        });
+    }
 }
