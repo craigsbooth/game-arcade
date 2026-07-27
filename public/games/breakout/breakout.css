@@ -1,0 +1,17 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:#0f0a2a; min-height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; color:#fff; }
+#app { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.back-btn { position:fixed; top:12px; left:12px; z-index:100; font-weight:700; font-size:14px; color:rgba(255,255,255,0.5); text-decoration:none; padding:8px 16px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); }
+.back-btn:hover { color:#fff; }
+#hud { display:flex; gap:24px; }
+.hud-item { display:flex; flex-direction:column; align-items:center; }
+.hl { font-size:9px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,0.3); }
+.hv { font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:#f472b6; }
+#canvas { display:block; border-radius:6px; border:2px solid rgba(244,114,182,0.15); box-shadow:0 0 30px rgba(244,114,182,0.05); cursor:none; }
+#overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; z-index:1000; }
+#overlay.hidden { display:none; }
+.ov-box { text-align:center; padding:36px 48px; border-radius:18px; background:#1a1040; border:2px solid rgba(244,114,182,0.2); }
+.ov-box h2 { font-family:'Fredoka One',cursive; font-size:28px; color:#f472b6; margin-bottom:8px; }
+.ov-box p { color:rgba(255,255,255,0.5); margin-bottom:18px; }
+.btn { font-family:'Fredoka One',cursive; font-size:15px; padding:12px 32px; border:none; border-radius:28px; background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(244,114,182,0.3); }
+.btn:hover { transform:translateY(-2px); }

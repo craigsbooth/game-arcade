@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Breakout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="breakout.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div class="hud-item"><span class="hl">SCORE</span><span class="hv" id="score">0</span></div>
+            <div class="hud-item"><span class="hl">LEVEL</span><span class="hv" id="level">1</span></div>
+            <div class="hud-item"><span class="hl">LIVES</span><span class="hv" id="lives">●●●</span></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="hidden">
+            <div class="ov-box">
+                <h2 id="ov-title">GAME OVER</h2>
+                <p id="ov-sub">Score: 0</p>
+                <button id="ov-btn" class="btn">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="breakout.js"></script>
+</body>
+</html>
