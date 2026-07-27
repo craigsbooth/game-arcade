@@ -96,6 +96,14 @@ function getDisplayState(room) {
         base.playerDice = room.players.map(p => ({ alive: p.ldAlive, diceCount: p.ldDiceCount, dice: room.liarsdice.phase === 'reveal' || room.liarsdice.phase === 'finished' ? p.ldDice : null }));
         base.roundResults = room.liarsdice.roundResults;
         base.ldWinner = room.liarsdice.winner;
+    } else if (room.game === 'connect4' && room.c4) {
+        base.c4Board = room.c4.board;
+        base.c4Winner = room.c4.winner;
+        base.c4WinCells = room.c4.winCells;
+        base.c4LastMove = room.c4.lastMove;
+    } else if (room.game === 'checkers' && room.checkers) {
+        base.ckBoard = room.checkers.board;
+        base.ckWinner = room.checkers.winner;
     }
 
     return base;
@@ -159,6 +167,18 @@ function getPlayerState(room, playerIdx) {
         base.playerDice = room.players.map(p => ({ alive: p.ldAlive, diceCount: p.ldDiceCount }));
         base.roundResults = room.liarsdice.roundResults;
         base.ldWinner = room.liarsdice.winner;
+    } else if (room.game === 'connect4' && room.c4) {
+        base.c4Board = room.c4.board;
+        base.c4Winner = room.c4.winner;
+        base.c4WinCells = room.c4.winCells;
+        base.isMyC4Turn = room.currentPlayer === playerIdx;
+        base.myColor = playerIdx;
+    } else if (room.game === 'checkers' && room.checkers) {
+        base.ckBoard = room.checkers.board;
+        base.ckWinner = room.checkers.winner;
+        base.isMyTurn = room.currentPlayer === playerIdx;
+        base.myPieces = playerIdx === 0 ? [1,3] : [2,4];
+        base.mustJump = room.checkers.mustJump;
     }
 
     return base;
@@ -879,6 +899,146 @@ function ldNextPlayer(room) {
     } while (!room.players[room.currentPlayer].ldAlive);
 }
 
+// ===== CONNECT FOUR LOGIC =====
+function startConnectFour(room) {
+    room.c4 = {
+        board: Array.from({length:6}, () => Array(7).fill(null)), // 6 rows x 7 cols
+        winner: null,
+        winCells: null,
+        lastMove: null
+    };
+    room.currentPlayer = 0;
+    room.phase = 'playing';
+}
+
+function c4Drop(room, playerIdx, col) {
+    if (room.currentPlayer !== playerIdx) return false;
+    if (col < 0 || col > 6) return false;
+    const board = room.c4.board;
+    // Find lowest empty row in column
+    let row = -1;
+    for (let r = 5; r >= 0; r--) {
+        if (board[r][col] === null) { row = r; break; }
+    }
+    if (row === -1) return false; // column full
+
+    board[row][col] = playerIdx;
+    room.c4.lastMove = { row, col, player: playerIdx };
+
+    // Check win
+    const win = c4CheckWin(board, row, col, playerIdx);
+    if (win) {
+        room.c4.winner = playerIdx;
+        room.c4.winCells = win;
+        room.phase = 'finished';
+    } else if (board[0].every(c => c !== null)) {
+        // Draw
+        room.c4.winner = -1;
+        room.phase = 'finished';
+    } else {
+        room.currentPlayer = 1 - playerIdx;
+    }
+    return true;
+}
+
+function c4CheckWin(board, row, col, player) {
+    const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+    for (const [dr,dc] of dirs) {
+        let cells = [[row,col]];
+        for (let d=1; d<4; d++) {
+            const r=row+dr*d, c=col+dc*d;
+            if (r>=0&&r<6&&c>=0&&c<7&&board[r][c]===player) cells.push([r,c]);
+            else break;
+        }
+        for (let d=1; d<4; d++) {
+            const r=row-dr*d, c=col-dc*d;
+            if (r>=0&&r<6&&c>=0&&c<7&&board[r][c]===player) cells.push([r,c]);
+            else break;
+        }
+        if (cells.length >= 4) return cells.slice(0,4);
+    }
+    return null;
+}
+
+// ===== CHECKERS LOGIC =====
+function startCheckers(room) {
+    // Board: 0=empty, 1=p1, 2=p2, 3=p1king, 4=p2king
+    const board = Array.from({length:8}, () => Array(8).fill(0));
+    // Place pieces
+    for (let r=0; r<3; r++) for (let c=0; c<8; c++) { if ((r+c)%2===1) board[r][c]=2; }
+    for (let r=5; r<8; r++) for (let c=0; c<8; c++) { if ((r+c)%2===1) board[r][c]=1; }
+    room.checkers = { board, winner: null, mustJump: null };
+    room.currentPlayer = 0;
+    room.phase = 'playing';
+}
+
+function checkersMove(room, playerIdx, from, to) {
+    if (room.currentPlayer !== playerIdx) return false;
+    const board = room.checkers.board;
+    const [fr, fc] = from;
+    const [tr, tc] = to;
+    const piece = board[fr][fc];
+    const pNum = playerIdx + 1; // 1 or 2
+    if (piece !== pNum && piece !== pNum + 2) return false; // not your piece
+    if (board[tr][tc] !== 0) return false;
+    if ((tr+tc)%2 !== 1) return false; // must be dark square
+
+    const isKing = piece >= 3;
+    const dr = tr - fr, dc = tc - fc;
+
+    // Simple move
+    if (Math.abs(dr)===1 && Math.abs(dc)===1) {
+        if (!isKing && pNum===1 && dr>0) return false; // p1 moves up (decreasing row)
+        if (!isKing && pNum===2 && dr<0) return false;
+        if (room.checkers.mustJump) return false; // must jump if available
+        board[tr][tc] = piece; board[fr][fc] = 0;
+        promoteIfNeeded(board, tr, tc, pNum);
+        room.currentPlayer = 1 - playerIdx;
+        room.checkers.mustJump = null;
+    }
+    // Jump
+    else if (Math.abs(dr)===2 && Math.abs(dc)===2) {
+        const mr = fr+dr/2, mc = fc+dc/2;
+        const mid = board[mr][mc];
+        const enemy = playerIdx===0 ? [2,4] : [1,3];
+        if (!enemy.includes(mid)) return false;
+        if (!isKing && pNum===1 && dr>0) return false;
+        if (!isKing && pNum===2 && dr<0) return false;
+        board[tr][tc] = piece; board[fr][fc] = 0; board[mr][mc] = 0;
+        promoteIfNeeded(board, tr, tc, pNum);
+        // Multi-jump?
+        if (hasJump(board, tr, tc, pNum)) {
+            room.checkers.mustJump = [tr, tc];
+        } else {
+            room.currentPlayer = 1 - playerIdx;
+            room.checkers.mustJump = null;
+        }
+    } else { return false; }
+
+    // Check win
+    const enemyPieces = playerIdx===0 ? [2,4] : [1,3];
+    const enemyCount = board.flat().filter(c => enemyPieces.includes(c)).length;
+    if (enemyCount === 0) { room.checkers.winner = playerIdx; room.phase = 'finished'; }
+
+    return true;
+}
+
+function promoteIfNeeded(board, r, c, pNum) {
+    if (pNum===1 && r===0) board[r][c] = 3;
+    if (pNum===2 && r===7) board[r][c] = 4;
+}
+
+function hasJump(board, r, c, pNum) {
+    const piece = board[r][c];
+    const isKing = piece >= 3;
+    const dirs = isKing ? [[-1,-1],[-1,1],[1,-1],[1,1]] : (pNum===1 ? [[-1,-1],[-1,1]] : [[1,-1],[1,1]]);
+    const enemy = pNum===1 ? [2,4] : [1,3];
+    return dirs.some(([dr,dc]) => {
+        const mr=r+dr, mc=c+dc, tr=r+dr*2, tc=c+dc*2;
+        return tr>=0&&tr<8&&tc>=0&&tc<8&&enemy.includes(board[mr][mc])&&board[tr][tc]===0;
+    });
+}
+
 // ===== SOCKET.IO =====
 io.on('connection', (socket) => {
 
@@ -969,6 +1129,12 @@ io.on('connection', (socket) => {
         } else if (room.game === 'liarsdice') {
             if (room.players.length < 2) return;
             startLiarsDice(room);
+        } else if (room.game === 'connect4') {
+            if (room.players.length !== 2) return;
+            startConnectFour(room);
+        } else if (room.game === 'checkers') {
+            if (room.players.length !== 2) return;
+            startCheckers(room);
         }
         broadcastRoom(room.code);
     });
@@ -1097,6 +1263,20 @@ io.on('connection', (socket) => {
         if (!socket.isHost) return;
         ldNextRound(room);
         broadcastRoom(room.code);
+    });
+
+    // === CONNECT FOUR ACTIONS ===
+    socket.on('c4Drop', ({ col }) => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'connect4' || room.phase !== 'playing') return;
+        if (c4Drop(room, socket.playerIdx, col)) broadcastRoom(room.code);
+    });
+
+    // === CHECKERS ACTIONS ===
+    socket.on('checkersMove', ({ from, to }) => {
+        const room = getRoom(socket.roomCode);
+        if (!room || room.game !== 'checkers' || room.phase !== 'playing') return;
+        if (checkersMove(room, socket.playerIdx, from, to)) broadcastRoom(room.code);
     });
 
     // === RESTART ===

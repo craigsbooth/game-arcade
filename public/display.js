@@ -109,6 +109,8 @@ function renderDisplay() {
     else if (state.game === 'trivia') renderTrivia(content, turn);
     else if (state.game === 'blackjack') renderBlackjack(content, turn);
     else if (state.game === 'liarsdice') renderLiarsDice(content, turn);
+    else if (state.game === 'connect4') renderConnect4(content, turn);
+    else if (state.game === 'checkers') renderCheckers(content, turn);
 }
 
 // ===== UNO DISPLAY =====
@@ -220,6 +222,8 @@ function renderWinner(content, turn) {
     else if (state.game === 'guesswho') winnerIdx = state.winner;
     else if (state.game === 'trivia') winnerIdx = state.winner;
     else if (state.game === 'liarsdice') winnerIdx = state.ldWinner;
+    else if (state.game === 'connect4') winnerIdx = state.c4Winner;
+    else if (state.game === 'checkers') winnerIdx = state.ckWinner;
 
     const winnerName = winnerIdx !== null ? state.players[winnerIdx].name : 'Unknown';
 
@@ -374,6 +378,43 @@ function renderLiarsDice(content, turn) {
                             <div style="font-size:12px;color:rgba(255,255,255,0.4)">${pd.diceCount} dice</div>
                         </div>
                     `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// ===== CONNECT 4 DISPLAY =====
+function renderConnect4(content, turn) {
+    if (state.phase === 'finished') { renderWinner(content, turn); return; }
+    const cp = state.currentPlayer;
+    turn.textContent = `${state.players[cp].name}'s Turn`;
+    const colors = ['#ef4444','#facc15'];
+    content.innerHTML = `
+        <div style="text-align:center">
+            <div style="display:inline-grid;grid-template-columns:repeat(7,48px);gap:4px;padding:12px;background:#1e40af;border-radius:12px;">
+                ${state.c4Board.flat().map((cell,i) => `
+                    <div style="width:48px;height:48px;border-radius:50%;background:${cell===null?'#1e3a5f':colors[cell]};border:2px solid rgba(0,0,0,0.2);${cell!==null?'box-shadow:inset 0 -3px 6px rgba(0,0,0,0.3)':''}"></div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// ===== CHECKERS DISPLAY =====
+function renderCheckers(content, turn) {
+    if (state.phase === 'finished') { renderWinner(content, turn); return; }
+    const cp = state.currentPlayer;
+    turn.textContent = `${state.players[cp].name}'s Turn`;
+    const board = state.ckBoard;
+    const pieceMap = {0:'',1:'⚫',2:'⚪',3:'👑',4:'👑'};
+    const cellColors = (r,c) => (r+c)%2===1 ? '#5c3d1e' : '#deb887';
+    content.innerHTML = `
+        <div style="text-align:center">
+            <div style="display:inline-grid;grid-template-columns:repeat(8,44px);border:3px solid #3d2815;border-radius:4px;">
+                ${board.flat().map((cell,i) => {
+                    const r=Math.floor(i/8), c=i%8;
+                    return `<div style="width:44px;height:44px;background:${cellColors(r,c)};display:flex;align-items:center;justify-content:center;font-size:24px">${cell===3?'<span style="color:#333">👑</span>':cell===4?'<span style="color:#eee">👑</span>':cell===1?'⚫':cell===2?'⚪':''}</div>`;
                 }).join('')}
             </div>
         </div>

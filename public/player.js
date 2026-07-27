@@ -98,6 +98,8 @@ function renderGame() {
     else if (state.game === 'trivia') renderTriviaPlayer(content);
     else if (state.game === 'blackjack') renderBjPlayer(content);
     else if (state.game === 'liarsdice') renderLdPlayer(content);
+    else if (state.game === 'connect4') renderC4Player(content);
+    else if (state.game === 'checkers') renderCheckersPlayer(content);
 }
 
 // ===== UNO PLAYER =====
@@ -421,6 +423,8 @@ function renderWinner(content) {
     else if (state.game === 'guesswho') winnerIdx = state.winner;
     else if (state.game === 'trivia') winnerIdx = state.winner;
     else if (state.game === 'liarsdice') winnerIdx = state.ldWinner;
+    else if (state.game === 'connect4') winnerIdx = state.c4Winner;
+    else if (state.game === 'checkers') winnerIdx = state.ckWinner;
 
     const isWinner = winnerIdx === state.playerIdx;
     content.innerHTML = `
@@ -591,5 +595,78 @@ function renderLdPlayer(content) {
             const qty = parseInt(document.getElementById('ld-qty').value);
             socket.emit('ldBid', { quantity: qty, face: selectedFace });
         });
+    }
+}
+
+
+// ===== CONNECT 4 PLAYER =====
+function renderC4Player(content) {
+    if (state.phase === 'finished') { renderWinner(content); return; }
+    const isMyTurn = state.isMyC4Turn;
+    const colors = ['#ef4444','#facc15'];
+    const myColor = colors[state.myColor];
+
+    content.innerHTML = `
+        <div class="player-header">
+            <span class="turn-text">${isMyTurn ? 'Your Turn' : 'Waiting...'}</span>
+            <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:${myColor}"></span>
+        </div>
+        <div style="text-align:center;padding:10px">
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px">${isMyTurn ? 'Tap a column to drop your disc' : 'Opponent is thinking...'}</p>
+            <div style="display:inline-grid;grid-template-columns:repeat(7,40px);gap:3px;padding:8px;background:#1e40af;border-radius:10px;">
+                ${state.c4Board.flat().map((cell, i) => {
+                    const col = i % 7;
+                    return `<div style="width:40px;height:40px;border-radius:50%;background:${cell===null?'#1e3a5f':colors[cell]};border:2px solid rgba(0,0,0,0.2);cursor:pointer" ${isMyTurn && cell===null ? `onclick="socket.emit('c4Drop',{col:${col}})"` : ''}></div>`;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// ===== CHECKERS PLAYER =====
+let ckSelected = null;
+function renderCheckersPlayer(content) {
+    if (state.phase === 'finished') { renderWinner(content); return; }
+    const isMyTurn = state.isMyTurn;
+    const board = state.ckBoard;
+    const myPieces = state.myPieces;
+
+    content.innerHTML = `
+        <div class="player-header">
+            <span class="turn-text">${isMyTurn ? 'Your Turn' : 'Waiting...'}</span>
+            ${isMyTurn ? '<span class="my-turn-badge">SELECT & MOVE</span>' : '<span class="wait-badge">OPPONENT</span>'}
+        </div>
+        <div style="text-align:center;padding:8px">
+            <div id="ck-board" style="display:inline-grid;grid-template-columns:repeat(8,38px);border:2px solid #3d2815;border-radius:4px;"></div>
+        </div>
+    `;
+
+    const boardEl = document.getElementById('ck-board');
+    for (let r=0; r<8; r++) {
+        for (let c=0; c<8; c++) {
+            const cell = document.createElement('div');
+            const isDark = (r+c)%2===1;
+            cell.style.cssText = `width:38px;height:38px;background:${isDark?'#5c3d1e':'#deb887'};display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;${ckSelected&&ckSelected[0]===r&&ckSelected[1]===c?'outline:3px solid #facc15;':''}`;
+            const piece = board[r][c];
+            if (piece===1) cell.textContent='⚫';
+            else if (piece===2) cell.textContent='⚪';
+            else if (piece===3) cell.innerHTML='<span style="font-size:16px">♚</span>';
+            else if (piece===4) cell.innerHTML='<span style="font-size:16px;color:#eee">♚</span>';
+
+            if (isMyTurn) {
+                cell.addEventListener('click', () => {
+                    if (ckSelected) {
+                        // Try move
+                        socket.emit('checkersMove', { from: ckSelected, to: [r,c] });
+                        ckSelected = null;
+                        renderCheckersPlayer(content);
+                    } else if (myPieces.includes(board[r][c])) {
+                        ckSelected = [r,c];
+                        renderCheckersPlayer(content);
+                    }
+                });
+            }
+            boardEl.appendChild(cell);
+        }
     }
 }
