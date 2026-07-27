@@ -1,0 +1,274 @@
+/* ===== 2048 - Premium Styling ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #1a0f2e;
+    --surface: #2d1b4e;
+    --board-bg: #1e1233;
+    --cell-bg: rgba(255,255,255,0.04);
+    --cell-size: 100px;
+    --gap: 10px;
+    --radius: 12px;
+    --text: #fff;
+    --text-dim: rgba(255,255,255,0.4);
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.back-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+.back-btn:hover { color: #fff; background: rgba(255,255,255,0.12); }
+
+/* Header */
+header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    max-width: 440px;
+    justify-content: space-between;
+}
+
+.game-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 48px;
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.scores {
+    display: flex;
+    gap: 10px;
+}
+
+.score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid rgba(243, 156, 18, 0.15);
+    min-width: 70px;
+}
+.score-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+}
+.score-value {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: #f39c12;
+}
+
+.controls {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-new {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(243, 156, 18, 0.2);
+    color: #f39c12;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.btn-new:hover { background: rgba(243, 156, 18, 0.3); transform: translateY(-1px); }
+
+/* Board */
+#board-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#board {
+    position: relative;
+    width: calc(4 * var(--cell-size) + 5 * var(--gap));
+    height: calc(4 * var(--cell-size) + 5 * var(--gap));
+    padding: var(--gap);
+    border-radius: 16px;
+    background: var(--board-bg);
+    border: 2px solid rgba(243, 156, 18, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.grid-bg {
+    position: absolute;
+    inset: var(--gap);
+    display: grid;
+    grid-template-columns: repeat(4, var(--cell-size));
+    grid-template-rows: repeat(4, var(--cell-size));
+    gap: var(--gap);
+}
+.grid-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(4, var(--cell-size));
+    grid-template-rows: repeat(4, var(--cell-size));
+    gap: var(--gap);
+}
+
+/* Background cells */
+#board .cell-bg {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: var(--radius);
+    background: var(--cell-bg);
+    position: absolute;
+}
+
+/* Tiles */
+#tiles {
+    position: absolute;
+    inset: var(--gap);
+}
+
+.tile {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 36px;
+    color: #fff;
+    transition: top 0.15s ease, left 0.15s ease;
+    z-index: 1;
+}
+
+.tile.new {
+    animation: tileAppear 0.2s ease-out;
+}
+@keyframes tileAppear {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.tile.merged {
+    animation: tileMerge 0.2s ease-out;
+    z-index: 2;
+}
+@keyframes tileMerge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Tile Colors */
+.tile-2 { background: linear-gradient(145deg, #3d3157, #2d2045); font-size: 36px; }
+.tile-4 { background: linear-gradient(145deg, #4a3768, #3a2858); font-size: 36px; }
+.tile-8 { background: linear-gradient(145deg, #e67e22, #d35400); font-size: 36px; }
+.tile-16 { background: linear-gradient(145deg, #e74c3c, #c0392b); font-size: 34px; }
+.tile-32 { background: linear-gradient(145deg, #f44336, #d32f2f); font-size: 34px; }
+.tile-64 { background: linear-gradient(145deg, #e91e63, #c2185b); font-size: 34px; }
+.tile-128 { background: linear-gradient(145deg, #f39c12, #e67e22); font-size: 30px; }
+.tile-256 { background: linear-gradient(145deg, #f1c40f, #f39c12); font-size: 30px; }
+.tile-512 { background: linear-gradient(145deg, #2ecc71, #27ae60); font-size: 30px; }
+.tile-1024 { background: linear-gradient(145deg, #3498db, #2980b9); font-size: 26px; }
+.tile-2048 { background: linear-gradient(145deg, #9b59b6, #8e44ad); font-size: 26px; box-shadow: 0 0 30px rgba(155, 89, 182, 0.5); }
+.tile-4096 { background: linear-gradient(145deg, #1abc9c, #16a085); font-size: 24px; }
+.tile-8192 { background: linear-gradient(145deg, #e74c3c, #922b21); font-size: 24px; }
+
+.instructions {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 8px;
+}
+
+/* Overlay */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+#overlay.hidden { display: none; }
+
+.overlay-content {
+    text-align: center;
+    padding: 40px 50px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 2px solid rgba(243, 156, 18, 0.2);
+    animation: popIn 0.3s ease-out;
+}
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.overlay-content h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+.overlay-content p {
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    :root {
+        --cell-size: 72px;
+        --gap: 8px;
+    }
+    .game-logo { font-size: 36px; }
+    .tile { font-size: 28px; }
+    .tile-128, .tile-256, .tile-512 { font-size: 24px; }
+    .tile-1024, .tile-2048 { font-size: 20px; }
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2048</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="2048.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+
+        <header>
+            <h1 class="game-logo">2048</h1>
+            <div class="scores">
+                <div class="score-box">
+                    <span class="score-label">Score</span>
+                    <span class="score-value" id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">Best</span>
+                    <span class="score-value" id="best">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <button id="new-game-btn" class="btn-new">New Game</button>
+        </div>
+
+        <div id="board-container">
+            <div id="board">
+                <div class="grid-bg"></div>
+                <div id="tiles"></div>
+            </div>
+        </div>
+
+        <p class="instructions">Use arrow keys or swipe to move tiles</p>
+
+        <!-- Game Over Overlay -->
+        <div id="overlay" class="hidden">
+            <div class="overlay-content">
+                <h2 id="overlay-title">Game Over</h2>
+                <p id="overlay-score">Score: 0</p>
+                <button id="retry-btn" class="btn-new">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="2048.js"></script>
+</body>
+</html>

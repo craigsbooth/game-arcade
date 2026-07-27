@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solitaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="solitaire.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+
+        <header>
+            <h1 class="game-title">SOLITAIRE</h1>
+            <div class="header-actions">
+                <div class="stat"><span class="stat-label">Moves</span><span id="moves" class="stat-val">0</span></div>
+                <div class="stat"><span class="stat-label">Time</span><span id="timer" class="stat-val">0:00</span></div>
+                <button id="new-game-btn" class="btn-action">New Game</button>
+            </div>
+        </header>
+
+        <div id="table">
+            <!-- Foundation (4 piles top right) -->
+            <div id="foundations">
+                <div class="foundation pile" data-pile="f0"></div>
+                <div class="foundation pile" data-pile="f1"></div>
+                <div class="foundation pile" data-pile="f2"></div>
+                <div class="foundation pile" data-pile="f3"></div>
+            </div>
+
+            <!-- Stock & Waste (top left) -->
+            <div id="stock-area">
+                <div id="stock" class="pile"></div>
+                <div id="waste" class="pile"></div>
+            </div>
+
+            <!-- Tableau (7 columns) -->
+            <div id="tableau">
+                <div class="tableau-col pile" data-pile="t0"></div>
+                <div class="tableau-col pile" data-pile="t1"></div>
+                <div class="tableau-col pile" data-pile="t2"></div>
+                <div class="tableau-col pile" data-pile="t3"></div>
+                <div class="tableau-col pile" data-pile="t4"></div>
+                <div class="tableau-col pile" data-pile="t5"></div>
+                <div class="tableau-col pile" data-pile="t6"></div>
+            </div>
+        </div>
+
+        <!-- Win Overlay -->
+        <div id="win-overlay" class="hidden">
+            <div class="win-content">
+                <div class="win-icon">🎉</div>
+                <h2>You Win!</h2>
+                <p id="win-stats">32 moves in 2:45</p>
+                <button id="win-new-game" class="btn-primary">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="solitaire.js"></script>
+</body>
+</html>

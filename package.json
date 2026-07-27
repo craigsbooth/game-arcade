@@ -1,17 +1,45 @@
 {
-  "name": "game",
+  "name": "game-arcade",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Game Arcade - Multiplayer party games",
+  "main": "main.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "electron": "electron .",
+    "dist": "electron-builder --win",
+    "build": "electron-builder --win"
   },
   "keywords": [],
-  "author": "",
+  "author": "Craig",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "express": "5.2.1",
     "socket.io": "4.8.3"
+  },
+  "devDependencies": {
+    "electron": "43.2.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.gamearcade.app",
+    "productName": "Game Arcade",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "server.js",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    },
+    "portable": {
+      "artifactName": "GameArcade.exe"
+    }
   }
 }

@@ -1,9 +1,17 @@
 /* ===== HOST DISPLAY STYLES ===== */
 
 /* Landing */
+#landing {
+    justify-content: flex-start;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+}
 #landing header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
 }
 
 .arcade-logo {
@@ -27,43 +35,63 @@
 
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
     max-width: 800px;
     width: 100%;
+}
+
+.section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    width: 100%;
+    max-width: 800px;
+    margin-top: 24px;
+    margin-bottom: -4px;
+    padding-left: 4px;
 }
 
 .game-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 35px 20px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.04);
-    border: 2px solid rgba(255,255,255,0.08);
+    gap: 10px;
+    padding: 28px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 2px solid rgba(255,255,255,0.06);
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
+    color: #fff;
 }
 .game-card:hover {
-    border-color: rgba(255,255,255,0.25);
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
 }
 .game-card .card-icon {
-    font-size: 48px;
-    height: 60px;
+    font-size: 40px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .game-card h2 {
     font-family: 'Fredoka One', cursive;
-    font-size: 20px;
+    font-size: 17px;
 }
 .game-card p {
-    font-size: 13px;
-    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+}
+
+.solo-card:hover {
+    border-color: rgba(79, 195, 247, 0.3);
+    box-shadow: 0 12px 30px rgba(79, 195, 247, 0.1);
 }
 .uno-icon {
     display: flex;

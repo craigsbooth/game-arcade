@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="snake.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+
+        <header>
+            <h1 class="game-title">SNAKE</h1>
+            <div class="stats">
+                <div class="stat"><span class="stat-label">Score</span><span class="stat-val" id="score">0</span></div>
+                <div class="stat"><span class="stat-label">Best</span><span class="stat-val" id="best">0</span></div>
+            </div>
+        </header>
+
+        <div id="game-area">
+            <canvas id="canvas"></canvas>
+            <div id="start-overlay">
+                <p>Press <strong>Space</strong> or tap to start</p>
+            </div>
+        </div>
+
+        <div id="mobile-controls">
+            <button class="ctrl-btn" id="ctrl-up">▲</button>
+            <div class="ctrl-row">
+                <button class="ctrl-btn" id="ctrl-left">◄</button>
+                <button class="ctrl-btn" id="ctrl-down">▼</button>
+                <button class="ctrl-btn" id="ctrl-right">►</button>
+            </div>
+        </div>
+    </div>
+    <script src="snake.js"></script>
+</body>
+</html>

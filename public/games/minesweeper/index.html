@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="minesweeper.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+
+        <!-- Header -->
+        <header id="game-header">
+            <div class="header-left">
+                <div class="stat-box mines-box">
+                    <span class="stat-icon">💣</span>
+                    <span class="stat-value" id="mines-remaining">10</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <button id="reset-btn" class="reset-btn">
+                    <span id="face">🙂</span>
+                </button>
+            </div>
+            <div class="header-right">
+                <div class="stat-box timer-box">
+                    <span class="stat-icon">⏱️</span>
+                    <span class="stat-value" id="timer">000</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Difficulty Selector -->
+        <div id="difficulty-bar">
+            <button class="diff-btn active" data-rows="9" data-cols="9" data-mines="10">Easy</button>
+            <button class="diff-btn" data-rows="16" data-cols="16" data-mines="40">Medium</button>
+            <button class="diff-btn" data-rows="16" data-cols="30" data-mines="99">Expert</button>
+        </div>
+
+        <!-- Game Grid -->
+        <div id="grid-container">
+            <div id="grid"></div>
+        </div>
+
+        <!-- Win/Lose Overlay -->
+        <div id="overlay" class="hidden">
+            <div class="overlay-content">
+                <div class="overlay-icon" id="overlay-icon">🏆</div>
+                <h2 id="overlay-title">You Win!</h2>
+                <p id="overlay-subtitle">Time: 42s</p>
+                <button id="overlay-btn" class="btn-primary">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="minesweeper.js"></script>
+</body>
+</html>
