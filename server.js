@@ -9,6 +9,18 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ===== ERROR LOGGING =====
+const fs = require('fs');
+const logFile = path.join(__dirname, 'error.log');
+
+app.post('/api/log-error', express.json(), (req, res) => {
+    const { game, error, stack, userAgent, timestamp } = req.body || {};
+    const entry = `[${timestamp || new Date().toISOString()}] [${game || 'unknown'}] ${error}\n  Stack: ${stack || 'none'}\n  UA: ${userAgent || 'unknown'}\n\n`;
+    fs.appendFileSync(logFile, entry);
+    console.error(`CLIENT ERROR [${game}]:`, error);
+    res.json({ ok: true });
+});
+
 // ===== ROOM MANAGEMENT =====
 const rooms = new Map();
 
