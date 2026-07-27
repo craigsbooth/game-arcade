@@ -86,7 +86,7 @@ function update() {
 
     // Move pac every N frames (tile-based movement with smooth interpolation)
     moveTimer++;
-    const moveRate = 4; // move every 4 frames
+    const moveRate = 8; // move every 8 frames (~7.5 tiles/sec)
     if(moveTimer >= moveRate) {
         moveTimer=0;
         // Try next direction first
