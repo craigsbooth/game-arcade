@@ -14,13 +14,12 @@ class SnakeGame {
         this.running = false;
         this.gameOver = false;
         this.speed = 120;
-        this.lastTime = 0;
-        this.accumulator = 0;
+        this.intervalId = null;
 
         this.snake = [];
         this.direction = { x: 1, y: 0 };
         this.nextDirection = { x: 1, y: 0 };
-        this.food = { x: 0, y: 0 };
+        this.food = { x: 10, y: 10 };
         this.particles = [];
 
         this.elScore = document.getElementById('score');
@@ -56,14 +55,17 @@ class SnakeGame {
         let sx, sy;
         this.canvas.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; });
         this.canvas.addEventListener('touchend', e => {
+            if (sx == null || sy == null) return;
             const dx = e.changedTouches[0].clientX - sx;
             const dy = e.changedTouches[0].clientY - sy;
+            if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
             if (Math.abs(dx) > Math.abs(dy)) {
                 this.setDirection(dx > 0 ? 'ArrowRight' : 'ArrowLeft');
             } else {
                 this.setDirection(dy > 0 ? 'ArrowDown' : 'ArrowUp');
             }
             this.start();
+            sx = null; sy = null;
         });
     }
 
@@ -80,8 +82,8 @@ class SnakeGame {
         };
         const dir = map[key];
         if (!dir) return;
-        // Prevent reversing
-        if (dir.x === -this.direction.x && dir.y === -this.direction.y) return;
+        // Prevent reversing into yourself
+        if (this.snake.length > 1 && dir.x === -this.direction.x && dir.y === -this.direction.y) return;
         this.nextDirection = dir;
     }
 
@@ -89,10 +91,17 @@ class SnakeGame {
         if (this.running) return;
         if (this.gameOver) this.reset();
         this.running = true;
-        this.accumulator = 0;
         this.elOverlay.classList.add('hidden');
-        this.lastTime = performance.now();
-        requestAnimationFrame((t) => this.loop(t));
+        // Use setInterval for rock-solid timing
+        this.intervalId = setInterval(() => this.tick(), this.speed);
+    }
+
+    stop() {
+        this.running = false;
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
     }
 
     reset() {
@@ -110,35 +119,34 @@ class SnakeGame {
         this.particles = [];
         this.elScore.textContent = '0';
         this.placeFood();
+        this.draw();
     }
 
     placeFood() {
-        let pos;
-        do {
-            pos = {
-                x: Math.floor(Math.random() * this.tileCount),
-                y: Math.floor(Math.random() * this.tileCount)
-            };
-        } while (this.snake.some(s => s.x === pos.x && s.y === pos.y));
-        this.food = pos;
+        const empty = [];
+        for (let x = 0; x < this.tileCount; x++) {
+            for (let y = 0; y < this.tileCount; y++) {
+                if (!this.snake.some(s => s.x === x && s.y === y)) {
+                    empty.push({ x, y });
+                }
+            }
+        }
+        if (empty.length === 0) {
+            // You filled the entire board — you win!
+            this.die();
+            return;
+        }
+        this.food = empty[Math.floor(Math.random() * empty.length)];
     }
 
-    loop(time) {
-        if (!this.running) return;
-
-        const delta = Math.min(time - this.lastTime, 200); // Cap delta to avoid spiral of death
-        this.lastTime = time;
-        this.accumulator += delta;
-
-        // Only do one update per frame max to prevent issues
-        if (this.accumulator >= this.speed) {
+    tick() {
+        try {
             this.update();
-            this.accumulator = 0;
-            if (!this.running) return;
+            this.draw();
+        } catch (e) {
+            console.error('Snake error:', e);
+            this.die();
         }
-
-        this.draw();
-        requestAnimationFrame((t) => this.loop(t));
     }
 
     update() {
@@ -156,9 +164,11 @@ class SnakeGame {
         }
 
         // Self collision
-        if (this.snake.some(s => s.x === head.x && s.y === head.y)) {
-            this.die();
-            return;
+        for (let i = 0; i < this.snake.length; i++) {
+            if (this.snake[i].x === head.x && this.snake[i].y === head.y) {
+                this.die();
+                return;
+            }
         }
 
         this.snake.unshift(head);
@@ -167,9 +177,17 @@ class SnakeGame {
         if (head.x === this.food.x && head.y === this.food.y) {
             this.score++;
             this.elScore.textContent = this.score;
-            this.speed = Math.max(50, 120 - this.score * 2);
             this.spawnParticles(this.food.x, this.food.y);
             this.placeFood();
+
+            // Speed up - restart interval with faster speed
+            if (this.score % 5 === 0 && this.speed > 60) {
+                this.speed -= 5;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = setInterval(() => this.tick(), this.speed);
+                }
+            }
         } else {
             this.snake.pop();
         }
@@ -179,12 +197,12 @@ class SnakeGame {
         this.particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.life -= 0.03;
+            p.life -= 0.05;
         });
     }
 
     spawnParticles(x, y) {
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 6; i++) {
             this.particles.push({
                 x: (x + 0.5) * this.gridSize,
                 y: (y + 0.5) * this.gridSize,
@@ -196,7 +214,7 @@ class SnakeGame {
     }
 
     die() {
-        this.running = false;
+        this.stop();
         this.gameOver = true;
         if (this.score > this.best) {
             this.best = this.score;
@@ -249,7 +267,8 @@ class SnakeGame {
         ctx.fill();
 
         // Snake
-        this.snake.forEach((seg, i) => {
+        for (let i = 0; i < this.snake.length; i++) {
+            const seg = this.snake[i];
             const t = i / this.snake.length;
             const r = Math.floor(46 - t * 20);
             const g = Math.floor(204 - t * 80);
@@ -282,18 +301,21 @@ class SnakeGame {
                 const ey = seg.y * gs + gs * 0.5 + this.direction.y * 4;
                 ctx.beginPath();
                 ctx.arc(ex - 3, ey - 3, 2.5, 0, Math.PI * 2);
-                ctx.arc(ex + 3, ey - 3, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(ex + 3, ey + 3, 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
-        });
+        }
 
         // Particles
-        this.particles.forEach(p => {
+        for (let i = 0; i < this.particles.length; i++) {
+            const p = this.particles[i];
             ctx.fillStyle = `rgba(231, 76, 60, ${p.life})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y, 3 * p.life, 0, Math.PI * 2);
             ctx.fill();
-        });
+        }
     }
 }
 
