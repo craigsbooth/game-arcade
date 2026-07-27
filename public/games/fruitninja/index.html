@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fruit Ninja</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#1a0a2e;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:none}
+        #app{position:relative;display:flex;flex-direction:column;align-items:center}
+        .back-btn{position:fixed;top:12px;left:12px;z-index:100;font-weight:700;font-size:14px;color:rgba(255,255,255,0.6);text-decoration:none;padding:8px 16px;border-radius:20px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);cursor:pointer}
+        #canvas{display:block;border-radius:6px;touch-action:none}
+        #hud{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:20px;font-weight:800;font-size:16px;color:#fff;text-shadow:1px 2px 2px rgba(0,0,0,0.4);z-index:5;pointer-events:none}
+        #hud span{color:#fbbf24}
+        #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:10;border-radius:6px}
+        #overlay.hidden{display:none}
+        .ov-box{text-align:center;padding:30px 40px;border-radius:16px;background:#1a0a2e;border:2px solid rgba(239,68,68,0.3)}
+        .ov-box h2{font-family:'Fredoka One',cursive;font-size:28px;color:#ef4444;margin-bottom:8px}
+        .ov-box p{color:rgba(255,255,255,0.5);margin-bottom:14px}
+        .ov-btn{font-family:'Fredoka One',cursive;font-size:15px;padding:12px 30px;border:none;border-radius:26px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:pointer}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div>SCORE <span id="score">0</span></div>
+            <div>LIVES <span id="lives">❌❌❌</span></div>
+            <div>BEST <span id="best">0</span></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="hidden">
+            <div class="ov-box">
+                <h2>GAME OVER</h2>
+                <p id="ov-stats">Score: 0</p>
+                <button class="ov-btn" id="retry-btn">SLICE AGAIN</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="fruitninja.js"></script>
+</body>
+</html>
