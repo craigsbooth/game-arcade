@@ -1,0 +1,23 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:#020810; color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; overflow:hidden; }
+#app { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.back-btn { position:fixed; top:12px; left:12px; z-index:100; font-weight:700; font-size:14px; color:rgba(255,255,255,0.5); text-decoration:none; padding:8px 16px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); }
+.back-btn:hover { color:#fff; }
+#hud { display:flex; gap:20px; padding:8px 0; }
+.hud-item { display:flex; flex-direction:column; align-items:center; }
+.hud-label { font-size:9px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,0.3); }
+.hud-val { font-family:'Press Start 2P',monospace; font-size:14px; color:#4ade80; }
+#canvas { display:block; border:2px solid rgba(74,222,128,0.15); border-radius:4px; box-shadow:0 0 40px rgba(74,222,128,0.05); }
+#mobile-controls { display:none; gap:12px; margin-top:10px; }
+.ctrl { width:64px; height:64px; border-radius:14px; border:2px solid rgba(74,222,128,0.3); background:rgba(2,8,16,0.9); color:#4ade80; font-size:22px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.ctrl:active { background:rgba(74,222,128,0.15); transform:scale(0.95); }
+.ctrl.fire { width:100px; font-size:12px; font-family:'Fredoka One',cursive; letter-spacing:2px; }
+#overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; z-index:1000; }
+#overlay.hidden { display:none; }
+.overlay-box { text-align:center; padding:40px 50px; border-radius:20px; background:#0a1020; border:2px solid rgba(74,222,128,0.2); }
+.overlay-box h2 { font-family:'Fredoka One',cursive; font-size:28px; color:#4ade80; margin-bottom:8px; }
+.overlay-box p { color:rgba(255,255,255,0.5); margin-bottom:20px; }
+.btn-play { font-family:'Fredoka One',cursive; font-size:16px; padding:12px 36px; border:none; border-radius:30px; background:linear-gradient(135deg,#4ade80,#16a34a); color:#fff; cursor:pointer; box-shadow:0 4px 15px rgba(74,222,128,0.3); }
+.btn-play:hover { transform:translateY(-2px); }
+@media (max-width:600px) { #mobile-controls { display:flex; } }
+@media (pointer:coarse) { #mobile-controls { display:flex; } }

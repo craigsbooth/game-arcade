@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Invaders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="invaders.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div class="hud-item"><span class="hud-label">SCORE</span><span class="hud-val" id="score">0</span></div>
+            <div class="hud-item"><span class="hud-label">WAVE</span><span class="hud-val" id="wave">1</span></div>
+            <div class="hud-item"><span class="hud-label">LIVES</span><span class="hud-val" id="lives">♥♥♥</span></div>
+            <div class="hud-item"><span class="hud-label">BEST</span><span class="hud-val" id="best">0</span></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="mobile-controls">
+            <button class="ctrl" id="ctrl-left">◄</button>
+            <button class="ctrl fire" id="ctrl-fire">FIRE</button>
+            <button class="ctrl" id="ctrl-right">►</button>
+        </div>
+        <div id="overlay" class="hidden">
+            <div class="overlay-box">
+                <h2 id="overlay-title">GAME OVER</h2>
+                <p id="overlay-sub">Score: 0</p>
+                <button id="restart-btn" class="btn-play">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="invaders.js"></script>
+</body>
+</html>
