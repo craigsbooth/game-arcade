@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#0f172a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+        #app{width:100%;max-width:700px;padding:24px;text-align:center}
+        .back-btn{position:fixed;top:12px;left:12px;font-weight:700;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)}
+        h1{font-family:'Fredoka One',cursive;font-size:32px;color:#38bdf8;margin-bottom:20px}
+        #stats{display:flex;gap:24px;justify-content:center;margin-bottom:20px}
+        .stat{display:flex;flex-direction:column;align-items:center;padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)}
+        .stat-label{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.3);text-transform:uppercase}
+        .stat-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#38bdf8}
+        #text-display{font-family:'JetBrains Mono',monospace;font-size:18px;line-height:2;text-align:left;padding:20px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);margin-bottom:16px;min-height:140px;user-select:none}
+        #text-display .correct{color:#4ade80}
+        #text-display .wrong{color:#ef4444;text-decoration:underline}
+        #text-display .current{border-left:2px solid #38bdf8;animation:blink 1s infinite}
+        @keyframes blink{0%,100%{border-color:#38bdf8}50%{border-color:transparent}}
+        #text-display .pending{color:rgba(255,255,255,0.3)}
+        #input{width:100%;padding:14px;font-family:'JetBrains Mono',monospace;font-size:16px;background:rgba(255,255,255,0.06);border:2px solid rgba(56,189,248,0.2);border-radius:10px;color:#fff;outline:none}
+        #input:focus{border-color:#38bdf8;box-shadow:0 0 15px rgba(56,189,248,0.1)}
+        #result{margin-top:20px;padding:20px;border-radius:12px;background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.15);display:none}
+        #result h2{font-family:'Fredoka One',cursive;color:#38bdf8;margin-bottom:8px}
+        .btn{font-family:'Fredoka One',cursive;font-size:15px;padding:12px 30px;border:none;border-radius:28px;background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff;cursor:pointer;margin-top:12px;box-shadow:0 4px 12px rgba(56,189,248,0.3)}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <h1>TYPING SPEED</h1>
+        <div id="stats">
+            <div class="stat"><span class="stat-label">WPM</span><span class="stat-val" id="wpm">0</span></div>
+            <div class="stat"><span class="stat-label">Accuracy</span><span class="stat-val" id="accuracy">100%</span></div>
+            <div class="stat"><span class="stat-label">Time</span><span class="stat-val" id="timer">60s</span></div>
+        </div>
+        <div id="text-display"></div>
+        <input type="text" id="input" placeholder="Start typing..." autocomplete="off" autofocus>
+        <div id="result">
+            <h2>Results</h2>
+            <p id="result-text"></p>
+            <button class="btn" onclick="newGame()">TRY AGAIN</button>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="typing.js"></script>
+</body>
+</html>

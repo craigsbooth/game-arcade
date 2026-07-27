@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#1e1b4b;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+        #app{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px}
+        .back-btn{position:fixed;top:12px;left:12px;font-weight:700;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)}
+        h1{font-family:'Fredoka One',cursive;font-size:28px;color:#a78bfa}
+        #stats{display:flex;gap:20px;font-size:14px;font-weight:700;color:rgba(255,255,255,0.5)}
+        #stats span{color:#a78bfa}
+        #board{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:480px}
+        .card{width:70px;height:70px;border-radius:10px;cursor:pointer;perspective:600px;transition:transform 0.1s}
+        .card:active{transform:scale(0.95)}
+        .card-inner{position:relative;width:100%;height:100%;transition:transform 0.4s;transform-style:preserve-3d}
+        .card.flipped .card-inner{transform:rotateY(180deg)}
+        .card.matched .card-inner{transform:rotateY(180deg)}
+        .card.matched{opacity:0.6;pointer-events:none}
+        .card-front,.card-back{position:absolute;inset:0;border-radius:10px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden}
+        .card-back{background:linear-gradient(145deg,#4c1d95,#3b0764);border:2px solid rgba(167,139,250,0.3);font-size:20px}
+        .card-front{background:#312e81;border:2px solid rgba(167,139,250,0.2);transform:rotateY(180deg);font-size:32px}
+        .btn{font-family:'Fredoka One',cursive;font-size:15px;padding:12px 30px;border:none;border-radius:28px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;cursor:pointer;margin-top:8px}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <h1>MEMORY MATCH</h1>
+        <div id="stats">Moves: <span id="moves">0</span> &nbsp;|&nbsp; Pairs: <span id="pairs">0</span>/18</div>
+        <div id="board"></div>
+        <button class="btn" onclick="newGame()">NEW GAME</button>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="memory.js"></script>
+</body>
+</html>
