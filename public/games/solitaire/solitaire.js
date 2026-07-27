@@ -56,6 +56,9 @@ class Solitaire {
                 if (cardEl) {
                     const cardIdx = parseInt(cardEl.dataset.index);
                     this.handleTableauClick(i, cardIdx);
+                } else {
+                    // Clicked empty column — try to move selected King here
+                    this.handleEmptyColumnClick(i);
                 }
             });
         });
@@ -166,6 +169,15 @@ class Solitaire {
 
         // Select this card (and all below it)
         this.selected = { pile: 'tableau', col: colIdx, index: cardIdx };
+        this.render();
+    }
+
+    handleEmptyColumnClick(colIdx) {
+        if (!this.selected) return;
+        if (this.tableau[colIdx].length > 0) return;
+        // Try to move selected to this empty column (only Kings allowed)
+        if (this.tryMove(colIdx)) return;
+        this.clearSelection();
         this.render();
     }
 

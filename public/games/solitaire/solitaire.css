@@ -143,6 +143,13 @@ header {
 
 .tableau-col {
     min-height: calc(var(--card-h) + 200px);
+    cursor: pointer;
+    border: 2px dashed transparent;
+    border-radius: var(--card-radius);
+    transition: border-color 0.2s ease;
+}
+.tableau-col:empty {
+    border-color: rgba(255,255,255,0.1);
 }
 
 /* Cards */
