@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Minion Rush</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#1a1040;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        #app{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .back-btn{position:fixed;top:10px;left:10px;z-index:100;font-weight:700;font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;padding:6px 14px;border-radius:16px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15)}
+        #hud{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:20px;font-weight:800;font-size:14px;color:#fff;text-shadow:1px 1px 2px rgba(0,0,0,0.4);z-index:5;pointer-events:none}
+        #hud span{color:#fbbf24}
+        #canvas{display:block;border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+        #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:10;border-radius:6px}
+        #overlay.hidden{display:none}
+        .ov-box{text-align:center;padding:28px 38px;border-radius:14px;background:#1a1040;border:2px solid rgba(251,191,36,0.3)}
+        .ov-box h2{font-family:'Fredoka One',cursive;font-size:24px;color:#fbbf24;margin-bottom:6px}
+        .ov-box p{color:rgba(255,255,255,0.5);margin-bottom:12px;font-size:13px}
+        .ov-btn{font-family:'Fredoka One',cursive;font-size:14px;padding:10px 26px;border:none;border-radius:22px;background:linear-gradient(135deg,#fbbf24,#d97706);color:#1a1040;cursor:pointer;font-weight:800}
+        #start-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:18px;color:#fff;text-shadow:1px 2px 0 rgba(0,0,0,0.3);z-index:5;pointer-events:none;animation:pulse 1.5s infinite}
+        #start-msg.hidden{display:none}
+        @keyframes pulse{0%,100%{opacity:0.7}50%{opacity:1}}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div>🍌 <span id="bananas">0</span></div>
+            <div>DIST <span id="dist">0</span>m</div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="start-msg">Swipe ← → to switch lanes<br>↑ Jump · ↓ Slide</div>
+        <div id="overlay" class="hidden">
+            <div class="ov-box">
+                <h2>GAME OVER</h2>
+                <p id="ov-stats">Distance: 0m | Bananas: 0</p>
+                <button class="ov-btn" id="retry-btn">RUN AGAIN</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="minionrush.js"></script>
+</body>
+</html>
