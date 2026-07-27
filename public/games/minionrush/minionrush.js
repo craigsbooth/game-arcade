@@ -1,13 +1,13 @@
 // ===== MINION RUSH - 3 Lane Runner =====
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const W = 400, H = 600;
+const W = 400, H = 700;
 canvas.width = W; canvas.height = H;
 
 // 3 lanes
 const LANE_W = W/3;
 const LANES = [LANE_W*0.5, LANE_W*1.5, LANE_W*2.5];
-const GROUND_Y = H - 100;
+const GROUND_Y = H - 130;
 const PLAYER_SIZE = 40;
 
 let player, obstacles, bananas, particles;
@@ -54,7 +54,7 @@ function slide() {
 function startGame() { gameState='playing'; document.getElementById('start-msg').classList.add('hidden'); }
 
 function newGame() {
-    lane=1; targetLane=1; score=0; bananaCount=0; speed=6; frame=0;
+    lane=1; targetLane=1; score=0; bananaCount=0; speed=3; frame=0;
     jumping=false; sliding=false; jumpVY=0; playerY=GROUND_Y-PLAYER_SIZE; slideTimer=0;
     obstacles=[]; bananas=[]; particles=[]; gameState='ready';
     document.getElementById('overlay').classList.add('hidden');
@@ -64,29 +64,28 @@ function newGame() {
 }
 
 function spawn() {
-    // Obstacles
-    if(Math.random()<0.03+speed*0.002) {
+    // Obstacles - spawn at top with lots of reaction time
+    if(Math.random()<0.015+speed*0.001) {
         const l=Math.floor(Math.random()*3);
         const types=['box','barrier','low'];
         const type=types[Math.floor(Math.random()*types.length)];
-        let h=PLAYER_SIZE, y=GROUND_Y-h;
-        if(type==='low'){h=20;y=GROUND_Y-20;} // slide under
-        if(type==='barrier'){h=60;y=GROUND_Y-60;}
-        obstacles.push({x:LANES[l],y:y,w:LANE_W*0.6,h,lane:l,type});
+        let h=PLAYER_SIZE, y=-80; // spawn well above screen
+        if(type==='low'){h=20;y=-80;}
+        if(type==='barrier'){h=60;y=-80;}
+        obstacles.push({x:LANES[l],y,w:LANE_W*0.6,h,lane:l,type});
     }
-    // Bananas
-    if(Math.random()<0.05) {
+    // Bananas - also from top
+    if(Math.random()<0.03) {
         const l=Math.floor(Math.random()*3);
-        const bY = jumping ? GROUND_Y-80-Math.random()*40 : GROUND_Y-PLAYER_SIZE-10;
-        bananas.push({x:LANES[l],y:bY-Math.random()*30,lane:l,collected:false});
+        bananas.push({x:LANES[l],y:-40,lane:l,collected:false});
     }
 }
 
 function update() {
     if(gameState!=='playing') return;
     frame++;
-    score = Math.floor(frame*speed*0.01);
-    speed = 6 + frame*0.002;
+    score = Math.floor(frame*speed*0.008);
+    speed = 3 + frame*0.0008; // very gentle ramp
     document.getElementById('dist').textContent = score;
 
     // Smooth lane switching
@@ -113,19 +112,20 @@ function update() {
     bananas.forEach(b => { b.y += speed; });
     bananas = bananas.filter(b => b.y < H+50);
 
-    // Collision
+    // Collision - only when obstacles reach player area
     const px = LANES[lane], py = playerY;
     const pw = PLAYER_SIZE*0.7, ph = sliding ? PLAYER_SIZE*0.4 : PLAYER_SIZE;
-    const pTop = sliding ? GROUND_Y-ph : py;
+    const pTop = sliding ? GROUND_Y-20 : py;
+    const pBot = pTop + ph;
 
     obstacles.forEach(o => {
         if(o.lane !== lane) return;
-        const oTop = o.y, oBot = o.y+o.h;
-        const pBot = pTop+ph;
-        if(oBot > pTop+5 && oTop < pBot-5) {
-            // Hit!
+        // Obstacle bottom edge must overlap player area
+        const oTop = o.y;
+        const oBot = o.y + o.h;
+        if(oBot > pTop && oTop < pBot) {
             if(o.type==='low' && sliding) return; // dodged by sliding
-            if(o.type==='box' && jumping && py < o.y-10) return; // jumped over
+            if(jumping && playerY < GROUND_Y - PLAYER_SIZE - 20) return; // jumped over
             die();
         }
     });
@@ -133,7 +133,7 @@ function update() {
     // Banana collection
     bananas.forEach(b => {
         if(b.collected||b.lane!==lane) return;
-        if(Math.abs(b.y - py)<40) {
+        if(b.y > playerY-10 && b.y < playerY+PLAYER_SIZE+10) {
             b.collected=true; bananaCount++;
             document.getElementById('bananas').textContent=bananaCount;
             for(let i=0;i<4;i++) particles.push({x:LANES[b.lane],y:b.y,vx:(Math.random()-0.5)*4,vy:-3-Math.random()*2,life:0.7,color:'#fbbf24'});
