@@ -106,9 +106,6 @@ header {
 #stock-area {
     display: flex;
     gap: 12px;
-    position: absolute;
-    top: 60px;
-    left: 16px;
 }
 
 #foundations {
@@ -116,6 +113,12 @@ header {
     gap: 10px;
     justify-content: flex-end;
     padding-right: 0;
+}
+
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 #tableau {

@@ -89,6 +89,7 @@ class SnakeGame {
         if (this.running) return;
         if (this.gameOver) this.reset();
         this.running = true;
+        this.accumulator = 0;
         this.elOverlay.classList.add('hidden');
         this.lastTime = performance.now();
         requestAnimationFrame((t) => this.loop(t));
@@ -125,13 +126,14 @@ class SnakeGame {
     loop(time) {
         if (!this.running) return;
 
-        const delta = time - this.lastTime;
+        const delta = Math.min(time - this.lastTime, 200); // Cap delta to avoid spiral of death
         this.lastTime = time;
         this.accumulator += delta;
 
-        while (this.accumulator >= this.speed) {
+        // Only do one update per frame max to prevent issues
+        if (this.accumulator >= this.speed) {
             this.update();
-            this.accumulator -= this.speed;
+            this.accumulator = 0;
             if (!this.running) return;
         }
 
