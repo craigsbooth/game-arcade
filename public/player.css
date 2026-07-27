@@ -371,3 +371,22 @@ body {
     color: rgba(255,255,255,0.5);
     font-size: 14px;
 }
+
+
+/* Home button */
+.home-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 5000;
+    font-weight: 700;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s ease;
+}
+.home-btn:hover { color: #fff; background: rgba(255,255,255,0.15); }
