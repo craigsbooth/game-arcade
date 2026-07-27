@@ -271,6 +271,10 @@ class Minesweeper {
             this.el.overlayTitle.textContent = 'You Win!';
             this.el.overlaySubtitle.textContent = `Cleared in ${this.timer} seconds`;
             this.el.overlay.classList.remove('hidden');
+            // Score = cells revealed minus time (higher is better)
+            const totalCells = this.rows * this.cols - this.totalMines;
+            const hsScore = Math.max(1, totalCells * 100 - this.timer * 10);
+            showHighScores('minesweeper', hsScore);
         }, 500);
     }
 

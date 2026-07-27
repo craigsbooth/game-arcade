@@ -57,6 +57,7 @@ function die() {
     finalScore.textContent = score;
     bestScore.textContent = best;
     gameOverEl.classList.remove('hidden');
+    showHighScores('flappy', score);
 }
 
 // ===== INPUT =====

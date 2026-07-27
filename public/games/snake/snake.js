@@ -226,6 +226,7 @@ class SnakeGame {
         }
         this.elOverlay.classList.remove('hidden');
         this.elOverlay.querySelector('p').innerHTML = `Game Over! Score: <strong>${this.score}</strong><br>Tap or press Space to restart`;
+        showHighScores('snake', this.score);
     }
 
     draw() {

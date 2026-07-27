@@ -149,6 +149,7 @@ function endGame() {
     gameState = 'dead';
     document.getElementById('ov-sub').textContent = `Score: ${score} | Level ${level}`;
     overlay.classList.remove('hidden');
+    showHighScores('breakout', score);
 }
 
 function spawnParticles(x, y, color, n) {

@@ -9,6 +9,36 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ===== HIGH SCORES =====
+const scoresFile = path.join(__dirname, 'highscores.json');
+
+function loadScores() {
+    try { return JSON.parse(fs.readFileSync(scoresFile, 'utf8')); }
+    catch(e) { return {}; }
+}
+function saveScores(scores) {
+    fs.writeFileSync(scoresFile, JSON.stringify(scores, null, 2));
+}
+
+app.get('/api/highscores/:game', (req, res) => {
+    const scores = loadScores();
+    const game = req.params.game;
+    res.json(scores[game] || []);
+});
+
+app.post('/api/highscores/:game', express.json(), (req, res) => {
+    const { name, score } = req.body;
+    if (!name || score === undefined) return res.status(400).json({ error: 'Missing name or score' });
+    const game = req.params.game;
+    const scores = loadScores();
+    if (!scores[game]) scores[game] = [];
+    scores[game].push({ name: String(name).slice(0,3).toUpperCase(), score: Number(score), date: Date.now() });
+    scores[game].sort((a,b) => b.score - a.score);
+    scores[game] = scores[game].slice(0, 10); // Keep top 10
+    saveScores(scores);
+    res.json(scores[game]);
+});
+
 // ===== ERROR LOGGING =====
 const fs = require('fs');
 const logFile = path.join(__dirname, 'error.log');

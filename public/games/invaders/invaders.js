@@ -230,6 +230,7 @@ function endGame() {
     if (score > best) { best=score; localStorage.setItem('invaders-best',String(best)); elBest.textContent=best; }
     document.getElementById('overlay-sub').textContent = `Score: ${score.toLocaleString()} | Wave ${wave}`;
     overlay.classList.remove('hidden');
+    showHighScores('invaders', score);
 }
 
 function spawnExplosion(x, y, color) {

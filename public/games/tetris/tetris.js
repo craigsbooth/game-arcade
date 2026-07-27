@@ -289,6 +289,7 @@ function gameLoop(time) {
 function showGameOver() {
     document.getElementById('final-score').textContent = `Score: ${score.toLocaleString()} | Level ${level}`;
     overlay.classList.remove('hidden');
+    showHighScores('tetris', score);
 }
 
 function newGame() {

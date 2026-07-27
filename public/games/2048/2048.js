@@ -192,6 +192,7 @@ class Game2048 {
                 this.el.overlayTitle.textContent = 'Game Over';
                 this.el.overlayScore.textContent = `Score: ${this.score}`;
                 this.el.overlay.classList.remove('hidden');
+                showHighScores('2048', this.score);
             }, 300);
         }
 

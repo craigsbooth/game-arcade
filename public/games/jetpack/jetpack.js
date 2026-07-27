@@ -194,6 +194,7 @@ function die() {
     document.getElementById('ov-best').textContent=`Best: ${best}m`;
     overlay.classList.remove('hidden');
     for(let i=0;i<20;i++) particles.push({x:PLAYER_X+Math.random()*20-10,y:player.y+Math.random()*20-10,vx:(Math.random()-0.5)*8,vy:(Math.random()-0.5)*8,life:1,color:Math.random()>0.5?'#ef4444':'#f97316',size:3+Math.random()*5,type:'spark'});
+    showHighScores('jetpack', Math.floor(distance));
 }
 
 // ===== RENDER =====
