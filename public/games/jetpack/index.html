@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jetpack Joyride</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="jetpack.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <canvas id="canvas"></canvas>
+        <div id="hud">
+            <div class="hud-item" id="hud-dist"><span>0</span>m</div>
+            <div class="hud-item" id="hud-coins">🪙 <span>0</span></div>
+        </div>
+        <div id="overlay" class="hidden">
+            <div class="ov-box">
+                <h2>MISSION FAILED</h2>
+                <p id="ov-stats">Distance: 0m | Coins: 0</p>
+                <p id="ov-best">Best: 0m</p>
+                <button id="retry-btn">TRY AGAIN</button>
+            </div>
+        </div>
+        <div id="start-overlay">
+            <p>Hold to fly · Release to fall</p>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="jetpack.js"></script>
+</body>
+</html>
