@@ -1331,16 +1331,28 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 
-// External URL is just the host itself when deployed
-const RENDER_URL = 'https://game-arcade-dt9z.onrender.com';
+// External URL - detect environment
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || null;
 
 app.get('/api/server-info', (req, res) => {
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const isLocal = host && (host.includes('localhost') || host.match(/^\d+\.\d+\.\d+\.\d+/));
-    // Always use Render URL for the join link so phones can connect
-    const joinUrl = isLocal ? `${RENDER_URL}/join.html` : `${protocol}://${host}/join.html`;
-    res.json({ joinUrl });
+    if (RENDER_URL) {
+        // Running on Render - use its public URL
+        res.json({ joinUrl: `${RENDER_URL}/join.html` });
+    } else {
+        // Running locally - use local network IP
+        const os = require('os');
+        const interfaces = os.networkInterfaces();
+        let localIP = 'localhost';
+        for (const name of Object.keys(interfaces)) {
+            for (const iface of interfaces[name]) {
+                if (iface.family === 'IPv4' && !iface.internal && !iface.address.startsWith('192.168.56')) {
+                    localIP = iface.address;
+                }
+            }
+        }
+        const joinUrl = `http://${localIP}:${PORT}/join.html`;
+        res.json({ joinUrl, note: 'For multiplayer, all devices must be on the same WiFi. Or use the Render deployment.' });
+    }
 });
 
 server.listen(PORT, '0.0.0.0', () => {
