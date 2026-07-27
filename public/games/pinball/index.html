@@ -2,53 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pinball</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="pinball.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinball - Space Cadet</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; height: 100vh; }
+        .back-btn {
+            position: fixed; top: 12px; left: 12px; z-index: 10000;
+            font-family: sans-serif; font-weight: 700; font-size: 14px;
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            padding: 8px 16px; border-radius: 20px;
+            background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { color: #fff; background: rgba(0,0,0,0.9); }
+        iframe {
+            width: 100vw; height: 100vh; border: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <a href="/" class="back-btn">← Back</a>
-        <div id="game-wrapper">
-            <div id="table-frame">
-                <canvas id="canvas"></canvas>
-            </div>
-            <div id="side-panel">
-                <div class="panel-title">PINBALL</div>
-                <div class="hud-item">
-                    <span class="hud-label">SCORE</span>
-                    <span class="hud-value" id="score">0</span>
-                </div>
-                <div class="hud-item">
-                    <span class="hud-label">BALLS</span>
-                    <span class="hud-value" id="balls">3</span>
-                </div>
-                <div class="hud-item">
-                    <span class="hud-label">BEST</span>
-                    <span class="hud-value" id="best">0</span>
-                </div>
-                <div class="hud-item">
-                    <span class="hud-label">MULTI</span>
-                    <span class="hud-value" id="multi">×1</span>
-                </div>
-                <div class="controls-info">
-                    <p><b>←</b> Left Flipper</p>
-                    <p><b>→</b> Right Flipper</p>
-                    <p><b>Space</b> Launch</p>
-                </div>
-            </div>
-        </div>
-        <div id="overlay" class="hidden">
-            <div class="overlay-box">
-                <h2 id="overlay-title">GAME OVER</h2>
-                <p id="overlay-score">Score: 0</p>
-                <button id="play-again" class="btn-play">PLAY AGAIN</button>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
-    <script src="/error-logger.js"></script>
-    <script src="pinball.js"></script>
+    <a href="/" class="back-btn">← Back</a>
+    <iframe src="https://lrusso.github.io/3DPinballSpaceCadet/3DPinballSpaceCadet.htm" allowfullscreen></iframe>
 </body>
 </html>
