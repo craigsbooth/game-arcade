@@ -1,0 +1,26 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:#0a0a1a; color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+#app { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.back-btn { position:fixed; top:12px; left:12px; z-index:100; font-weight:700; font-size:14px; color:rgba(255,255,255,0.5); text-decoration:none; padding:8px 16px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); }
+.back-btn:hover { color:#fff; background:rgba(255,255,255,0.12); }
+#game-wrapper { display:flex; gap:16px; align-items:flex-start; }
+#board-frame { border-radius:8px; border:3px solid #1a1a3e; box-shadow:0 0 40px rgba(100,100,255,0.1); overflow:hidden; }
+#board { display:block; background:#0f0f23; }
+#side-left, #side-right { display:flex; flex-direction:column; gap:10px; min-width:110px; }
+.info-box { display:flex; flex-direction:column; align-items:center; padding:10px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+.info-label { font-size:9px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,0.35); margin-bottom:6px; }
+.info-value { font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:#818cf8; }
+#hold-canvas, #next-canvas { display:block; background:rgba(0,0,0,0.3); border-radius:6px; }
+#mobile-controls { display:none; gap:8px; margin-top:10px; }
+.ctrl { width:56px; height:56px; border-radius:12px; border:2px solid rgba(129,140,248,0.3); background:rgba(15,15,35,0.9); color:#818cf8; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.ctrl:active { background:rgba(129,140,248,0.2); transform:scale(0.95); }
+.ctrl.wide { width:120px; font-size:14px; font-family:'Fredoka One',cursive; letter-spacing:2px; }
+#overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; z-index:1000; }
+#overlay.hidden { display:none; }
+.overlay-box { text-align:center; padding:40px 50px; border-radius:20px; background:#1a1a2e; border:2px solid rgba(129,140,248,0.2); }
+.overlay-box h2 { font-family:'Fredoka One',cursive; font-size:32px; color:#818cf8; margin-bottom:8px; }
+.overlay-box p { color:rgba(255,255,255,0.5); margin-bottom:20px; font-size:18px; }
+.btn-play { font-family:'Fredoka One',cursive; font-size:16px; padding:12px 36px; border:none; border-radius:30px; background:linear-gradient(135deg,#818cf8,#6366f1); color:#fff; cursor:pointer; box-shadow:0 4px 15px rgba(129,140,248,0.3); }
+.btn-play:hover { transform:translateY(-2px); }
+@media (max-width:600px) { #mobile-controls { display:flex; } #side-left { display:none; } }
+@media (pointer:coarse) { #mobile-controls { display:flex; } }
