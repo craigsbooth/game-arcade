@@ -10,6 +10,7 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ===== HIGH SCORES =====
+const fs = require('fs');
 const scoresFile = path.join(__dirname, 'highscores.json');
 
 function loadScores() {
@@ -40,7 +41,6 @@ app.post('/api/highscores/:game', express.json(), (req, res) => {
 });
 
 // ===== ERROR LOGGING =====
-const fs = require('fs');
 const logFile = path.join(__dirname, 'error.log');
 
 app.post('/api/log-error', express.json(), (req, res) => {
