@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Frogger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#000;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        #app{display:flex;flex-direction:column;align-items:center;gap:8px}
+        .back-btn{position:fixed;top:12px;left:12px;z-index:100;font-weight:700;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)}
+        #hud{display:flex;gap:20px;font-family:'Press Start 2P',monospace;font-size:11px;color:#fff}
+        .hud-val{color:#4ade80}
+        #canvas{display:block;border:2px solid #1a3a1a;border-radius:4px}
+        #mobile-controls{display:none;gap:6px;margin-top:6px}
+        .mc{width:52px;height:52px;border-radius:12px;border:2px solid rgba(74,222,128,0.3);background:rgba(0,0,0,0.7);color:#4ade80;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .mc:active{background:rgba(74,222,128,0.15)}
+        .mc-row{display:flex;gap:6px}
+        @media(pointer:coarse){#mobile-controls{display:flex;flex-direction:column;align-items:center}}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div>SCORE <span class="hud-val" id="score">0</span></div>
+            <div>LIVES <span class="hud-val" id="lives">●●●</span></div>
+            <div>LEVEL <span class="hud-val" id="level">1</span></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="mobile-controls">
+            <button class="mc" id="mu">▲</button>
+            <div class="mc-row">
+                <button class="mc" id="ml">◄</button>
+                <button class="mc" id="md">▼</button>
+                <button class="mc" id="mr">►</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="frogger.js"></script>
+</body>
+</html>
