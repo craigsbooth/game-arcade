@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Mario World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Nunito',sans-serif;background:#5c94fc;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        #app{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .back-btn{position:fixed;top:10px;left:10px;z-index:100;font-weight:700;font-size:13px;color:rgba(255,255,255,0.8);text-decoration:none;padding:6px 14px;border-radius:16px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.2)}
+        #hud{display:flex;gap:20px;font-weight:800;font-size:13px;color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,0.3)}
+        #hud span{color:#fbbf24}
+        #canvas{display:block;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+        #mobile-controls{display:none;gap:8px;margin-top:6px}
+        .mc-group{display:flex;gap:4px}
+        .mc{width:48px;height:48px;border-radius:12px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .mc:active{background:rgba(255,255,255,0.15)}
+        .mc.jump{width:70px;font-size:12px;font-weight:800;background:rgba(220,38,38,0.4);border-color:rgba(239,68,68,0.4)}
+        #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:10;border-radius:4px}
+        #overlay.hidden{display:none}
+        .ov-box{text-align:center;padding:28px 36px;border-radius:14px;background:#1a1a2e;border:2px solid rgba(251,191,36,0.3)}
+        .ov-box h2{font-family:'Fredoka One',cursive;font-size:24px;color:#fbbf24;margin-bottom:6px}
+        .ov-box p{color:rgba(255,255,255,0.5);margin-bottom:12px;font-size:14px}
+        .ov-btn{font-family:'Fredoka One',cursive;font-size:14px;padding:10px 26px;border:none;border-radius:22px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;cursor:pointer}
+        @media(pointer:coarse){#mobile-controls{display:flex;justify-content:space-between;width:100%;max-width:640px;padding:0 10px}}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <div id="hud">
+            <div>COINS <span id="coins">0</span></div>
+            <div>LIVES <span id="lives">3</span></div>
+            <div>WORLD <span id="world">1-1</span></div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="mobile-controls">
+            <div class="mc-group">
+                <button class="mc" id="m-left">◄</button>
+                <button class="mc" id="m-right">►</button>
+            </div>
+            <button class="mc jump" id="m-jump">JUMP</button>
+        </div>
+        <div id="overlay" class="hidden">
+            <div class="ov-box">
+                <h2 id="ov-title">LEVEL COMPLETE!</h2>
+                <p id="ov-sub">Coins: 0</p>
+                <button class="ov-btn" id="ov-btn">CONTINUE</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="marioworld.js"></script>
+</body>
+</html>
