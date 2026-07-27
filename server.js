@@ -1332,10 +1332,14 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 
 // External URL is just the host itself when deployed
+const RENDER_URL = 'https://game-arcade-dt9z.onrender.com';
+
 app.get('/api/server-info', (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const joinUrl = `${protocol}://${host}/join.html`;
+    const isLocal = host && (host.includes('localhost') || host.match(/^\d+\.\d+\.\d+\.\d+/));
+    // Always use Render URL for the join link so phones can connect
+    const joinUrl = isLocal ? `${RENDER_URL}/join.html` : `${protocol}://${host}/join.html`;
     res.json({ joinUrl });
 });
 
