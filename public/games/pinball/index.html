@@ -11,8 +11,11 @@
     <div id="app">
         <a href="/" class="back-btn">← Back</a>
         <div id="game-wrapper">
-            <canvas id="canvas"></canvas>
-            <div id="hud">
+            <div id="table-frame">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="side-panel">
+                <div class="panel-title">PINBALL</div>
                 <div class="hud-item">
                     <span class="hud-label">SCORE</span>
                     <span class="hud-value" id="score">0</span>
@@ -25,10 +28,16 @@
                     <span class="hud-label">BEST</span>
                     <span class="hud-value" id="best">0</span>
                 </div>
+                <div class="hud-item">
+                    <span class="hud-label">MULTI</span>
+                    <span class="hud-value" id="multi">×1</span>
+                </div>
+                <div class="controls-info">
+                    <p><b>←</b> Left Flipper</p>
+                    <p><b>→</b> Right Flipper</p>
+                    <p><b>Space</b> Launch</p>
+                </div>
             </div>
-        </div>
-        <div id="controls-hint">
-            <span>← → Flippers</span> · <span>Space = Launch</span>
         </div>
         <div id="overlay" class="hidden">
             <div class="overlay-box">
@@ -38,6 +47,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
     <script src="/error-logger.js"></script>
     <script src="pinball.js"></script>
 </body>
