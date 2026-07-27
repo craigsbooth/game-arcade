@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="blackjack.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+
+        <div id="table">
+            <div id="dealer-area">
+                <div class="area-label">DEALER <span id="dealer-score"></span></div>
+                <div id="dealer-cards" class="card-row"></div>
+            </div>
+
+            <div id="status-bar">
+                <div id="message"></div>
+            </div>
+
+            <div id="player-area">
+                <div class="area-label">YOU <span id="player-score"></span></div>
+                <div id="player-cards" class="card-row"></div>
+            </div>
+
+            <div id="controls">
+                <div id="bet-controls">
+                    <span class="chip-label">Chips: <strong id="chips">1000</strong></span>
+                    <div class="bet-row">
+                        <button class="chip-btn" data-bet="10">10</button>
+                        <button class="chip-btn" data-bet="25">25</button>
+                        <button class="chip-btn" data-bet="50">50</button>
+                        <button class="chip-btn" data-bet="100">100</button>
+                    </div>
+                    <div class="bet-display">Bet: <strong id="current-bet">0</strong></div>
+                    <button id="deal-btn" class="action-btn deal" disabled>DEAL</button>
+                </div>
+                <div id="play-controls" class="hidden">
+                    <button id="hit-btn" class="action-btn hit">HIT</button>
+                    <button id="stand-btn" class="action-btn stand">STAND</button>
+                    <button id="double-btn" class="action-btn double">DOUBLE</button>
+                </div>
+                <div id="result-controls" class="hidden">
+                    <button id="again-btn" class="action-btn deal">NEW HAND</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="/highscores.js"></script>
+    <script src="blackjack.js"></script>
+</body>
+</html>
