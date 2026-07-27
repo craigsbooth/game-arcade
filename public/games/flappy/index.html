@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flappy Bird</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="flappy.css">
+</head>
+<body>
+    <div id="app">
+        <a href="/" class="back-btn">← Back</a>
+        <canvas id="canvas"></canvas>
+        <div id="score-display">0</div>
+        <div id="start-msg">Tap or press Space to fly</div>
+        <div id="game-over" class="hidden">
+            <div class="go-box">
+                <h2>GAME OVER</h2>
+                <div class="go-scores">
+                    <div><span class="go-label">Score</span><span class="go-val" id="final-score">0</span></div>
+                    <div><span class="go-label">Best</span><span class="go-val" id="best-score">0</span></div>
+                </div>
+                <button id="retry-btn">TAP TO RETRY</button>
+            </div>
+        </div>
+    </div>
+    <script src="/error-logger.js"></script>
+    <script src="flappy.js"></script>
+</body>
+</html>

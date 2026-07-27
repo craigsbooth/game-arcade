@@ -1,0 +1,19 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:#4ec0ca; min-height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+#app { position:relative; }
+.back-btn { position:fixed; top:12px; left:12px; z-index:100; font-weight:700; font-size:14px; color:rgba(255,255,255,0.8); text-decoration:none; padding:8px 16px; border-radius:20px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); }
+.back-btn:hover { background:rgba(0,0,0,0.4); }
+#canvas { display:block; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,0.2); cursor:pointer; }
+#score-display { position:absolute; top:30px; left:50%; transform:translateX(-50%); font-family:'Fredoka One',cursive; font-size:56px; color:#fff; text-shadow:2px 3px 0 #000, 0 0 10px rgba(0,0,0,0.3); z-index:10; pointer-events:none; }
+#start-msg { position:absolute; top:55%; left:50%; transform:translate(-50%,-50%); font-family:'Fredoka One',cursive; font-size:20px; color:#fff; text-shadow:1px 2px 0 rgba(0,0,0,0.3); animation:pulse 1.5s infinite; pointer-events:none; z-index:10; }
+@keyframes pulse { 0%,100%{opacity:0.8;transform:translate(-50%,-50%) scale(1)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)} }
+#game-over { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:20; background:rgba(0,0,0,0.4); }
+#game-over.hidden { display:none; }
+.go-box { background:#ded895; border-radius:16px; padding:30px 40px; text-align:center; border:4px solid #5a3e1b; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+.go-box h2 { font-family:'Fredoka One',cursive; font-size:28px; color:#e63946; margin-bottom:14px; text-shadow:1px 1px 0 rgba(0,0,0,0.1); }
+.go-scores { display:flex; gap:30px; justify-content:center; margin-bottom:18px; }
+.go-scores > div { display:flex; flex-direction:column; align-items:center; }
+.go-label { font-size:12px; font-weight:800; color:#5a3e1b; text-transform:uppercase; }
+.go-val { font-family:'Fredoka One',cursive; font-size:32px; color:#5a3e1b; }
+#retry-btn { font-family:'Fredoka One',cursive; font-size:16px; padding:12px 32px; border:none; border-radius:30px; background:#e63946; color:#fff; cursor:pointer; box-shadow:0 4px 10px rgba(230,57,70,0.3); transition:transform 0.2s; }
+#retry-btn:hover { transform:scale(1.05); }
