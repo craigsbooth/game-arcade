@@ -105,17 +105,19 @@ class SnakeGame {
     }
 
     reset() {
-        const mid = Math.floor(this.tileCount / 2);
+        // Start toward center-left, moving right — gives player time to react
+        const startX = 5;
+        const startY = Math.floor(this.tileCount / 2);
         this.snake = [
-            { x: mid, y: mid },
-            { x: mid - 1, y: mid },
-            { x: mid - 2, y: mid }
+            { x: startX, y: startY },
+            { x: startX - 1, y: startY },
+            { x: startX - 2, y: startY }
         ];
         this.direction = { x: 1, y: 0 };
         this.nextDirection = { x: 1, y: 0 };
         this.score = 0;
         this.gameOver = false;
-        this.speed = 120;
+        this.speed = 150; // Slower start speed
         this.particles = [];
         this.elScore.textContent = '0';
         this.placeFood();
@@ -145,6 +147,7 @@ class SnakeGame {
             this.draw();
         } catch (e) {
             console.error('Snake error:', e);
+            if (window.logGameError) window.logGameError('Snake tick error: ' + e.message, e.stack);
             this.die();
         }
     }
@@ -181,7 +184,7 @@ class SnakeGame {
             this.placeFood();
 
             // Speed up - restart interval with faster speed
-            if (this.score % 5 === 0 && this.speed > 60) {
+            if (this.score % 5 === 0 && this.speed > 70) {
                 this.speed -= 5;
                 if (this.intervalId) {
                     clearInterval(this.intervalId);
